@@ -1,0 +1,25 @@
+{
+  "short_name": "RENTO",
+  "name": "RENTO Management",
+  "id": "/",
+  "icons": [
+    {
+      "src": "/logo-tab.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-tab.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#475569",
+  "background_color": "#ffffff",
+  "orientation": "portrait"
+}

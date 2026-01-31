@@ -1,0 +1,8 @@
+{
+  "name": "RENTO",
+  "description": "Sistem Manajemen Rental Mobil Profesional & Terintegrasi",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}
