@@ -6,7 +6,7 @@ export const Logo = ({ className = "h-12 w-auto", src }: { className?: string, s
       src="/logo-tab.png" akan mengambil gambar dari folder public/root.
     */}
     <img 
-      src={src || "/logo-tab.png"} 
+      src={src || "/RentO.svg"} 
       alt="App Logo" 
       className="w-full h-full object-contain" 
     />
