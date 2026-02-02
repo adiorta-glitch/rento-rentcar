@@ -1,31 +1,25 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 // @ts-ignore
 import { useNavigate } from 'react-router-dom';
 import { login } from '../services/authService';
 import { Lock, User, ArrowRight, ShieldCheck, Zap, Hexagon, KeyRound } from 'lucide-react';
 import { Logo } from '../components/Logo';
-import { getStoredData, DEFAULT_SETTINGS } from '../services/dataService';
 import { AppSettings } from '../types';
 import { ThemeEngine } from '../components/ThemeEngine';
 
-interface LoginPageProps {
+export interface LoginPageProps {
   onLogin: () => void;
+  settings: AppSettings;
 }
 
-const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
+const LoginPage: React.FC<LoginPageProps> = ({ onLogin, settings }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   
   const navigate = useNavigate();
-
-  useEffect(() => {
-      const storedSettings = getStoredData<AppSettings>('appSettings', DEFAULT_SETTINGS);
-      setSettings(storedSettings);
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,9 +80,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               {/* Outer Glow */}
               <div className="absolute -inset-8 bg-gradient-to-tr from-cyan-500/40 via-blue-600/40 to-purple-600/40 rounded-[4rem] blur-2xl opacity-40 group-hover:opacity-70 transition duration-1000 animate-pulse"></div>
               
-              {/* Logo Box (2.5x larger than original w-32 -> w-96) */}
+              {/* Logo Box (2.5x larger daripada w-32 -> w-96) */}
               <div className="relative w-96 h-96 bg-slate-900/60 backdrop-blur-2xl rounded-[3rem] flex items-center justify-center border border-slate-700/50 shadow-2xl ring-1 ring-white/10">
-                  {/* Logo Icon (2.5x larger than original w-20 -> w-64) */}
+                  {/* Logo Icon (2.5x larger daripada original w-20 -> w-64) */}
                   <Logo className="w-64 h-64 drop-shadow-[0_0_30px_rgba(6,182,212,0.3)] transition-transform duration-500 group-hover:scale-105" src={settings.logoUrl} />
               </div>
           </div>

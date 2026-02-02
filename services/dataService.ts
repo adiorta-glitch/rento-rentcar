@@ -1,3 +1,4 @@
+
 import { 
   Car, Driver, Partner, Customer, Booking, Transaction, AppSettings, HighSeason, 
   BookingStatus, PaymentStatus 
@@ -7,8 +8,8 @@ import { collection, getDocs, doc, writeBatch, setDoc, getDoc } from 'firebase/f
 import XLSX from 'xlsx';
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  companyName: "RENTO",
-  displayName: "RENTO",
+  companyName: "RentO",
+  displayName: "RentO",
   tagline: 'Solusi Transportasi Terpercaya',
   address: 'Jl. Raya Merdeka No. 123, Jakarta',
   phone: '0851-9068-0660',
@@ -17,7 +18,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   invoiceFooter: 'Terima kasih atas kepercayaan Anda menggunakan jasa kami.',
   themeColor: 'red',
   darkMode: false,
-  paymentTerms: '1. Pembayaran DP minimal 30% saat booking.\n2. Pelunasan dilakukan saat serah terima unit.\n3. Pembayaran via Transfer BCA 1234567890 a.n RENTO.',
+  paymentTerms: '1. Pembayaran DP minimal 30% saat booking.\n2. Pelunasan dilakukan saat serah terima unit.\n3. Pembayaran via Transfer BCA 1234567890 a.n RentO Rent Car.',
   termsAndConditions: `1. Persyaratan Sewa (Lepas Kunci)
 A. Untuk penyewaan tanpa pengemudi (self-drive), Penyewa wajib menyerahkan dokumen asli sebagai jaminan keamanan yang akan dikembalikan setelah masa sewa berakhir:
 B. Wajib: E-KTP Asli Penyewa.
@@ -45,7 +46,7 @@ B. Bahan Bakar (BBM): Sistem pengembalian BBM adalah posisi sama dengan saat pen
 C. Penggunaan: Mobil hanya boleh digunakan sesuai peruntukan jalan raya (bukan untuk offroad, balapan, atau mengangkut barang yang merusak interior/bau menyengat seperti durian/ikan basah tanpa wadah kedap udara).
 
 4. Kerusakan dan Kecelakaan
-A. Kerusakan Ringan (Lecet/Penyok): Penyewa bertanggung jawab penuh atas biaya perbaikan di bengkel yang ditunjuk oleh Pihak Rental.
+A. Kerusakan Light (Lecet/Penyok): Penyewa bertanggung jawab penuh atas biaya perbaikan di bengkel yang ditunjuk oleh Pihak Rental.
 B. Kerusakan Berat/Kecelakaan:
 i. Penyewa menanggung seluruh biaya perbaikan.
 ii. Biaya Masa Tunggu (Idle Cost): Penyewa wajib membayar biaya sewa harian selama mobil berada di bengkel (karena mobil tidak bisa beroperasi/menghasilkan uang).
@@ -118,19 +119,21 @@ const syncToFirestore = async (key: string, data: any) => {
         const colRef = collection(db, key);
         const cleanData = JSON.parse(JSON.stringify(data));
         const snapshot = await getDocs(colRef);
-        const newIds = new Set(cleanData.map((item: any) => item.id));
+        const newIds = new Set(cleanData.map((item: any) => String(item.id)));
         
         const operations: { type: 'set' | 'delete', ref: any, data?: any }[] = [];
 
+        // Identify items to delete from Cloud that are no longer in Local
         snapshot.docs.forEach(docSnap => {
-            if (!newIds.has(docSnap.id)) {
+            if (!newIds.has(String(docSnap.id))) {
                 operations.push({ type: 'delete', ref: docSnap.ref });
             }
         });
 
+        // Identify items to update/set in Cloud from Local
         cleanData.forEach((item: any) => {
             if (item.id) {
-                const docRef = doc(db, key, item.id);
+                const docRef = doc(db, key, String(item.id));
                 operations.push({ type: 'set', ref: docRef, data: item });
             }
         });
@@ -194,12 +197,63 @@ export const checkAvailability = (
     });
 };
 
-export const initializeData = async () => {
-    const hasSettings = localStorage.getItem(KEYS.SETTINGS);
-    if (!hasSettings) {
-        localStorage.setItem(KEYS.SETTINGS, JSON.stringify(DEFAULT_SETTINGS));
+/**
+ * Pulls all collections from Firestore and updates LocalStorage.
+ * This ensures that deletions in the DB console are reflected locally.
+ */
+export const initializeData = async (): Promise<AppSettings> => {
+    let cloudSettings: AppSettings = DEFAULT_SETTINGS;
+
+    // 1. Load Settings from Cloud
+    try {
+        if (db) {
+            const settingsDoc = await getDoc(doc(db, 'system', 'appSettings'));
+            if (settingsDoc.exists()) {
+                cloudSettings = settingsDoc.data() as AppSettings;
+                localStorage.setItem(KEYS.SETTINGS, JSON.stringify(cloudSettings));
+            } else {
+                const hasLocalSettings = localStorage.getItem(KEYS.SETTINGS);
+                if (hasLocalSettings) {
+                    cloudSettings = JSON.parse(hasLocalSettings);
+                } else {
+                    localStorage.setItem(KEYS.SETTINGS, JSON.stringify(DEFAULT_SETTINGS));
+                }
+            }
+        }
+    } catch (e) {
+        console.warn("Failed to pull settings from cloud, using local fallback.", e);
+        const hasLocalSettings = localStorage.getItem(KEYS.SETTINGS);
+        if (hasLocalSettings) cloudSettings = JSON.parse(hasLocalSettings);
     }
-    return true;
+
+    // 2. Pull All Collections (Mirrors DB to Local)
+    if (db) {
+        const collectionsToPull = [
+            { key: KEYS.CARS, storageKey: 'cars' },
+            { key: KEYS.BOOKINGS, storageKey: 'bookings' },
+            { key: KEYS.CUSTOMERS, storageKey: 'customers' },
+            { key: KEYS.DRIVERS, storageKey: 'drivers' },
+            { key: KEYS.PARTNERS, storageKey: 'partners' },
+            { key: KEYS.VENDORS, storageKey: 'vendors' },
+            { key: KEYS.TRANSACTIONS, storageKey: 'transactions' },
+            { key: KEYS.HIGH_SEASONS, storageKey: 'highSeasons' },
+            { key: KEYS.USERS, storageKey: 'users' }
+        ];
+
+        for (const col of collectionsToPull) {
+            try {
+                const snapshot = await getDocs(collection(db, col.key));
+                const data = snapshot.docs.map(d => d.data());
+                if (data.length > 0) {
+                    localStorage.setItem(col.storageKey, JSON.stringify(data));
+                }
+            } catch (err) {
+                console.error(`Failed to pull collection ${col.key}:`, err);
+            }
+        }
+    }
+
+    return cloudSettings;
 };
 
 // === EXCEL EXPORT & IMPORT SERVICES ===
@@ -279,9 +333,9 @@ export const downloadTemplateExcel = (type: 'armada' | 'pelanggan' | 'driver' | 
 
 export const mergeData = (existing: any[], imported: any[], key = 'id') => {
     const map = new Map();
-    existing.forEach(i => map.set(i[key], i));
+    existing.forEach(i => map.set(String(i[key]), i));
     imported.forEach(i => {
-        const id = i[key] || `imp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const id = i[key] ? String(i[key]) : `imp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         map.set(id, { ...i, [key]: id });
     });
     return Array.from(map.values());

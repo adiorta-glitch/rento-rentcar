@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
   <head>
@@ -12,8 +13,14 @@
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" href="logo-tab.png" />
     
-    <title>RENTO - Management System</title>
-    <!-- Polyfill for Import Maps (Ensures compatibility on older mobile browsers) -->
+    <title>RentO - Management System</title>
+
+    <!-- Performance: Preconnect to critical domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://esm.sh">
+
+    <!-- Polyfill for Import Maps -->
     <script async src="https://ga.jspm.io/npm:es-module-shims@1.10.1/dist/es-module-shims.js"></script>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -29,7 +36,10 @@
         }
       }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Optimized Font Loading -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    
     <style>
       body { font-family: 'Inter', sans-serif; background-color: #ffffff; overscroll-behavior-y: none; user-select: none; -webkit-tap-highlight-color: transparent; }
       .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -38,6 +48,7 @@
       .pt-safe { padding-top: env(safe-area-inset-top); }
       .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
     </style>
+
 <script type="importmap">
 {
   "imports": {

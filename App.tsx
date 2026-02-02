@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 // @ts-ignore
 import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Car, CalendarRange, Users, Wallet, RefreshCw, FileText, Palette, List, HelpCircle, Map, ChevronLeft, Calculator, Building, ReceiptText, UserCircle, UserCog, CalendarClock, Settings, LogOut, Receipt, PieChart } from 'lucide-react';
@@ -8,21 +8,33 @@ import { getCurrentUser, logout } from './services/authService';
 import { User, AppSettings } from './types';
 import { Logo, LogoText } from './components/Logo';
 import { ThemeEngine } from './components/ThemeEngine';
+
+// Critical Pages - Static Import for Type Safety and Performance
 import Dashboard from './pages/Dashboard';
-import BookingPage from './pages/BookingPage';
-import FleetPage from './pages/FleetPage';
-import PartnersPage from './pages/PartnersPage';
-import DriversPage from './pages/DriversPage';
-import VendorsPage from './pages/VendorsPage';
-import HighSeasonPage from './pages/HighSeasonPage';
-import SettingsPage from './pages/SettingsPage';
-import HelpPage from './pages/HelpPage';
 import LoginPage from './pages/LoginPage';
-import CustomersPage from './pages/CustomersPage';
-import ExpensesPage from './pages/ExpensesPage';
-import StatisticsPage from './pages/StatisticsPage';
-import CalculatorPage from './pages/CalculatorPage';
-import CollectiveInvoicePage from './pages/CollectiveInvoicePage';
+
+// Non-Critical Pages - Lazy Load
+const BookingPage = lazy(() => import('./pages/BookingPage'));
+const FleetPage = lazy(() => import('./pages/FleetPage'));
+const PartnersPage = lazy(() => import('./pages/PartnersPage'));
+const DriversPage = lazy(() => import('./pages/DriversPage'));
+const VendorsPage = lazy(() => import('./pages/VendorsPage'));
+const HighSeasonPage = lazy(() => import('./pages/HighSeasonPage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const HelpPage = lazy(() => import('./pages/HelpPage'));
+const CustomersPage = lazy(() => import('./pages/CustomersPage'));
+const ExpensesPage = lazy(() => import('./pages/ExpensesPage'));
+const StatisticsPage = lazy(() => import('./pages/StatisticsPage'));
+const CalculatorPage = lazy(() => import('./pages/CalculatorPage'));
+const CollectiveInvoicePage = lazy(() => import('./pages/CollectiveInvoicePage'));
+
+// Reusable Loading Component
+const PageLoader = () => (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] w-full">
+        <div className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-slate-400 text-xs font-black uppercase tracking-widest animate-pulse">Memuat Halaman...</p>
+    </div>
+);
 
 const SidebarItem = ({ to, icon: Icon, label }: { to: string; icon: any; label: string }) => {
   const location = useLocation();
@@ -51,14 +63,14 @@ const BottomNavItem = ({ to, icon: Icon, label }: { to: string; icon: any; label
 interface AppLayoutProps {
   children?: React.ReactNode;
   user: User;
+  settings: AppSettings;
   onLogout: () => void;
 }
 
-const AppLayout = ({ children, user, onLogout }: AppLayoutProps) => {
+const AppLayout = ({ children, user, settings, onLogout }: AppLayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [isRefreshing, setIsRefreshing] = useState(false);
   
   const isSuperAdmin = user.role === 'superadmin';
@@ -68,11 +80,6 @@ const AppLayout = ({ children, user, onLogout }: AppLayoutProps) => {
   
   const isOperational = isStaff || isSuperAdmin;
   const isHome = location.pathname === '/';
-
-  useEffect(() => {
-    const loadedSettings = getStoredData<AppSettings>('appSettings', DEFAULT_SETTINGS);
-    setSettings(loadedSettings);
-  }, []);
 
   const handleRefresh = async () => {
       setIsRefreshing(true);
@@ -190,7 +197,7 @@ const AppLayout = ({ children, user, onLogout }: AppLayoutProps) => {
           <div className="mb-6">
               <h3 className="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Layanan</h3>
               <div className="space-y-1">
-                  <SidebarItem to="/help" icon={HelpCircle} label="Pusat Bantuan" />
+                  <SidebarItem to="/help" icon={HelpCircle} label="Bantuan" />
                   <SidebarItem to="/settings" icon={Settings} label="Pengaturan" />
               </div>
           </div>
@@ -247,7 +254,9 @@ const AppLayout = ({ children, user, onLogout }: AppLayoutProps) => {
       </div>
 
       <main className="md:ml-64 p-4 md:p-8 pt-20 md:pt-8 pb-24 md:pb-8 min-h-screen">
-        {children}
+        <Suspense fallback={<PageLoader />}>
+            {children}
+        </Suspense>
       </main>
 
       <nav className="md:hidden fixed bottom-0 w-full bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 z-30 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
@@ -304,20 +313,29 @@ const AppLayout = ({ children, user, onLogout }: AppLayoutProps) => {
 
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const init = async () => {
-        await initializeData();
-        const currentUser = getCurrentUser();
-        setUser(currentUser);
-        setIsLoading(false);
+        try {
+            const latestSettings: AppSettings = await initializeData();
+            setSettings(latestSettings);
+            
+            const currentUser = getCurrentUser();
+            setUser(currentUser);
+        } catch (error) {
+            console.error("Initialization failed", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
     init();
   }, []);
 
   const handleLogin = () => {
     setUser(getCurrentUser());
+    setSettings(getStoredData<AppSettings>('appSettings', DEFAULT_SETTINGS));
   };
 
   const handleLogout = () => {
@@ -336,65 +354,67 @@ const App = () => {
 
   return (
     <Router>
-      <Routes>
-        <Route path="/login" element={!user ? <LoginPage onLogin={handleLogin} /> : <Navigate to="/" />} />
-        
-        <Route path="/" element={user ? <AppLayout user={user} onLogout={handleLogout}><Dashboard /></AppLayout> : <Navigate to="/login" />} />
-        
-        <Route path="/booking" element={
-            user && (user.role === 'admin' || user.role === 'superadmin') ? <AppLayout user={user} onLogout={handleLogout}><BookingPage currentUser={user}/></AppLayout> : <Navigate to="/" />
-        } />
-        
-        <Route path="/collective-invoice" element={
-            user && (user.role === 'admin' || user.role === 'superadmin') ? <AppLayout user={user} onLogout={handleLogout}><CollectiveInvoicePage/></AppLayout> : <Navigate to="/" />
-        } />
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/login" element={!user ? <LoginPage onLogin={handleLogin} settings={settings} /> : <Navigate to="/" />} />
+          
+          <Route path="/" element={user ? <AppLayout user={user} settings={settings} onLogout={handleLogout}><Dashboard /></AppLayout> : <Navigate to="/login" />} />
+          
+          <Route path="/booking" element={
+              user && (user.role === 'admin' || user.role === 'superadmin') ? <AppLayout user={user} settings={settings} onLogout={handleLogout}><BookingPage currentUser={user}/></AppLayout> : <Navigate to="/" />
+          } />
+          
+          <Route path="/collective-invoice" element={
+              user && (user.role === 'admin' || user.role === 'superadmin') ? <AppLayout user={user} settings={settings} onLogout={handleLogout}><CollectiveInvoicePage/></AppLayout> : <Navigate to="/" />
+          } />
 
-        <Route path="/calculator" element={
-            user && (user.role === 'admin' || user.role === 'superadmin') ? <AppLayout user={user} onLogout={handleLogout}><CalculatorPage/></AppLayout> : <Navigate to="/" />
-        } />
+          <Route path="/calculator" element={
+              user && (user.role === 'admin' || user.role === 'superadmin') ? <AppLayout user={user} settings={settings} onLogout={handleLogout}><CalculatorPage/></AppLayout> : <Navigate to="/" />
+          } />
 
-        <Route path="/fleet" element={
-            user && (user.role === 'admin' || user.role === 'superadmin' || user.role === 'partner') ? <AppLayout user={user} onLogout={handleLogout}><FleetPage currentUser={user}/></AppLayout> : <Navigate to="/" />
-        } />
-        
-        <Route path="/partners" element={
-            user ? <AppLayout user={user} onLogout={handleLogout}><PartnersPage currentUser={user}/></AppLayout> : <Navigate to="/" />
-        } />
+          <Route path="/fleet" element={
+              user && (user.role === 'admin' || user.role === 'superadmin' || user.role === 'partner') ? <AppLayout user={user} settings={settings} onLogout={handleLogout}><FleetPage currentUser={user}/></AppLayout> : <Navigate to="/" />
+          } />
+          
+          <Route path="/partners" element={
+              user ? <AppLayout user={user} settings={settings} onLogout={handleLogout}><PartnersPage currentUser={user}/></AppLayout> : <Navigate to="/" />
+          } />
 
-        <Route path="/vendors" element={
-            user && (user.role === 'admin' || user.role === 'superadmin') ? <AppLayout user={user} onLogout={handleLogout}><VendorsPage /></AppLayout> : <Navigate to="/" />
-        } />
-        
-        <Route path="/drivers" element={
-            user ? <AppLayout user={user} onLogout={handleLogout}><DriversPage currentUser={user}/></AppLayout> : <Navigate to="/" />
-        } />
-        
-        <Route path="/customers" element={
-            user && (user.role === 'admin' || user.role === 'superadmin') ? <AppLayout user={user} onLogout={handleLogout}><CustomersPage currentUser={user}/></AppLayout> : <Navigate to="/" />
-        } />
-        
-        <Route path="/expenses" element={
-            user ? <AppLayout user={user} onLogout={handleLogout}><ExpensesPage isDriverView={user.role === 'driver'} isPartnerView={user.role === 'partner'} /></AppLayout> : <Navigate to="/login" />
-        } />
-        
-        <Route path="/statistics" element={
-            user ? <AppLayout user={user} onLogout={handleLogout}><StatisticsPage /></AppLayout> : <Navigate to="/" />
-        } />
-        
-        <Route path="/high-season" element={
-            user && (user.role === 'admin' || user.role === 'superadmin') ? <AppLayout user={user} onLogout={handleLogout}><HighSeasonPage currentUser={user}/></AppLayout> : <Navigate to="/" />
-        } />
-        
-        <Route path="/settings" element={
-            user ? <AppLayout user={user} onLogout={handleLogout}><SettingsPage currentUser={user}/></AppLayout> : <Navigate to="/login" />
-        } />
+          <Route path="/vendors" element={
+              user && (user.role === 'admin' || user.role === 'superadmin') ? <AppLayout user={user} settings={settings} onLogout={handleLogout}><VendorsPage /></AppLayout> : <Navigate to="/" />
+          } />
+          
+          <Route path="/drivers" element={
+              user ? <AppLayout user={user} settings={settings} onLogout={handleLogout}><DriversPage currentUser={user}/></AppLayout> : <Navigate to="/" />
+          } />
+          
+          <Route path="/customers" element={
+              user && (user.role === 'admin' || user.role === 'superadmin') ? <AppLayout user={user} settings={settings} onLogout={handleLogout}><CustomersPage currentUser={user}/></AppLayout> : <Navigate to="/" />
+          } />
+          
+          <Route path="/expenses" element={
+              user ? <AppLayout user={user} settings={settings} onLogout={handleLogout}><ExpensesPage isDriverView={user.role === 'driver'} isPartnerView={user.role === 'partner'} /></AppLayout> : <Navigate to="/login" />
+          } />
+          
+          <Route path="/statistics" element={
+              user ? <AppLayout user={user} settings={settings} onLogout={handleLogout}><StatisticsPage /></AppLayout> : <Navigate to="/" />
+          } />
+          
+          <Route path="/high-season" element={
+              user && (user.role === 'admin' || user.role === 'superadmin') ? <AppLayout user={user} settings={settings} onLogout={handleLogout}><HighSeasonPage currentUser={user}/></AppLayout> : <Navigate to="/" />
+          } />
+          
+          <Route path="/settings" element={
+              user ? <AppLayout user={user} settings={settings} onLogout={handleLogout}><SettingsPage currentUser={user}/></AppLayout> : <Navigate to="/login" />
+          } />
 
-        <Route path="/help" element={
-            user ? <AppLayout user={user} onLogout={handleLogout}><HelpPage currentUser={user}/></AppLayout> : <Navigate to="/login" />
-        } />
-        
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
+          <Route path="/help" element={
+              user ? <AppLayout user={user} settings={settings} onLogout={handleLogout}><HelpPage currentUser={user}/></AppLayout> : <Navigate to="/login" />
+          } />
+          
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </Suspense>
     </Router>
   );
 };
