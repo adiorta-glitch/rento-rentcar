@@ -246,7 +246,7 @@ const PublicRegistration = () => {
                     <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center p-1.5 shadow-lg shadow-red-200"><Logo src={settings.logoUrl}/></div>
                     <div>
                         <h1 className="font-black text-slate-800 dark:text-white uppercase leading-none tracking-tight text-sm sm:text-base">{settings.displayName}</h1>
-                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Sewa Mobil Mandiri</p>
+                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Sewa Kendaraan Mandiri</p>
                     </div>
                 </div>
                 <div className="flex gap-1.5">
@@ -446,7 +446,7 @@ const PublicRegistration = () => {
                                 <Search size={18} className="absolute left-4 top-3.5 text-slate-400" />
                                 <input 
                                     type="text" 
-                                    placeholder="Cari mobil..." 
+                                    placeholder="Cari Kendaraan..." 
                                     className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl p-4 pl-12 text-sm font-bold dark:text-white focus:ring-2 ring-red-500 transition-all shadow-inner"
                                     value={carSearch}
                                     onChange={e => setCarSearch(e.target.value)}

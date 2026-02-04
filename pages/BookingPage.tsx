@@ -318,8 +318,8 @@ const BookingPage: React.FC<Props> = ({ currentUser }) => {
     e.preventDefault();
     if (!isRentToRent && carError) return;
     if (driverError) return;
-    if (isRentToRent && !externalCarName) { alert("Nama Mobil External harus diisi!"); return; }
-    if (!isRentToRent && !selectedCarId) { alert("Pilih Unit Mobil!"); return; }
+    if (isRentToRent && !externalCarName) { alert("Nama Kendaraan External harus diisi!"); return; }
+    if (!isRentToRent && !selectedCarId) { alert("Pilih Unit Kendaraan!"); return; }
 
     const start = new Date(`${startDate}T${startTime}`);
     const end = new Date(`${endDate}T${endTime}`);
@@ -693,7 +693,7 @@ const BookingPage: React.FC<Props> = ({ currentUser }) => {
                                           </div>
                                       )}
                                   </div>
-                                  <div className="space-y-1"><label className="text-[10px] font-black text-slate-400 uppercase">Nama Mobil External</label><input required type="text" className="w-full border rounded-lg p-2.5 text-sm font-bold dark:bg-slate-950" value={externalCarName} onChange={e => setExternalCarName(e.target.value)} /></div>
+                                  <div className="space-y-1"><label className="text-[10px] font-black text-slate-400 uppercase">Nama Kendaraan External</label><input required type="text" className="w-full border rounded-lg p-2.5 text-sm font-bold dark:bg-slate-950" value={externalCarName} onChange={e => setExternalCarName(e.target.value)} /></div>
                                   <div className="space-y-1"><label className="text-[10px] font-black text-slate-400 uppercase">Plat Nomor</label><input required type="text" className="w-full border rounded-lg p-2.5 text-sm font-bold uppercase dark:bg-slate-950" value={externalCarPlate} onChange={e => setExternalCarPlate(e.target.value)} /></div>
                                   <div className="space-y-1"><label className="text-[10px] font-black text-red-500 uppercase">HPP Vendor (Rp)</label><input required type="number" className="w-full border rounded-lg p-2.5 text-sm font-bold bg-red-50" value={vendorFee} onChange={e => setVendorFee(Number(e.target.value))} /></div>
                               </div>
