@@ -1,22 +1,23 @@
-// Added React to imports to fix 'Cannot find namespace React' errors
+
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Car, Partner, User, AppSettings } from '../types';
 import { getStoredData, setStoredData, DEFAULT_SETTINGS, exportToExcel, importFromExcel, mergeData, compressImage, downloadTemplateExcel } from '../services/dataService';
-import { Plus, Trash2, Edit2, User as UserIcon, Car as CarIcon, Upload, X, Download, FileSpreadsheet, MapPin, Camera, DollarSign, List, Info, Search, Filter, ChevronDown } from 'lucide-react';
+import { Plus, Trash2, Edit2, User as UserIcon, Car as CarIcon, Upload, X, Download, FileSpreadsheet, MapPin, Camera, DollarSign, List, Info, Search, Filter, ChevronDown, QrCode, Printer } from 'lucide-react';
 
 interface Props {
     currentUser: User;
 }
 
-// Added React.FC to define the functional component type
 const FleetPage: React.FC<Props> = ({ currentUser }) => {
   const [cars, setCars] = useState<Car[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
+  const [selectedCarQR, setSelectedCarQR] = useState<Car | null>(null);
   const [editingCar, setEditingCar] = useState<Car | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false); // Added isSaving state
+  const [isSaving, setIsSaving] = useState(false); 
   const [modalTab, setModalTab] = useState<'umum' | 'harga'>('umum');
   const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
 
@@ -33,7 +34,7 @@ const FleetPage: React.FC<Props> = ({ currentUser }) => {
   const [plate, setPlate] = useState('');
   const [type, setType] = useState('MPV');
   const [prices, setPrices] = useState<{[key: string]: number}>({});
-  const [investorSetoran, setInvestorSetoran, ] = useState(0);
+  const [investorSetoran, setInvestorSetoran] = useState(0);
   const [driverSalary, setDriverSalary] = useState(0);
   const [partnerId, setPartnerId] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -58,7 +59,7 @@ const FleetPage: React.FC<Props> = ({ currentUser }) => {
 
   const openModal = (car?: Car) => {
     setModalTab('umum');
-    setIsSaving(false); // Reset saving state
+    setIsSaving(false);
     if (car) {
         setEditingCar(car);
         setName(car.name);
@@ -69,15 +70,7 @@ const FleetPage: React.FC<Props> = ({ currentUser }) => {
         setImagePreview(car.image);
         setInvestorSetoran(car.investorSetoran || 0);
         setDriverSalary(car.driverSalary || 0);
-        if (car.pricing) {
-            setPrices(car.pricing);
-        } else {
-             // Fallback for legacy data
-             setPrices({
-                 '12 Jam (Dalam Kota)': car.price12h || 0,
-                 '24 Jam (Dalam Kota)': car.price24h || 0,
-             });
-        }
+        setPrices(car.pricing || {});
     } else {
         setEditingCar(null);
         setName('');
@@ -93,11 +86,36 @@ const FleetPage: React.FC<Props> = ({ currentUser }) => {
     setIsModalOpen(true);
   };
 
+  const showQR = (car: Car) => {
+      setSelectedCarQR(car);
+      setIsQRModalOpen(true);
+  };
+
+  const handleDownloadQR = async () => {
+    if (!selectedCarQR) return;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(window.location.origin + '/#/booking?carId=' + selectedCarQR.id)}`;
+    
+    try {
+        const response = await fetch(qrUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `QR_${selectedCarQR.name.replace(/\s+/g, '_')}_${selectedCarQR.plate.replace(/\s+/g, '')}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error("Gagal mengunduh QR", error);
+        window.open(qrUrl, '_blank');
+    }
+  };
+
   const handlePriceChange = (pkg: string, value: number) => {
       setPrices(prev => ({ ...prev, [pkg]: value }));
   };
 
-  // Added React.ChangeEvent type for image upload event
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -115,12 +133,11 @@ const FleetPage: React.FC<Props> = ({ currentUser }) => {
 
   const handleRemoveImage = () => setImagePreview(null);
 
-  // Added React.FormEvent type for form submit event
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSaving) return; // Prevent double submission
+    if (isSaving) return;
     
-    setIsSaving(true); // Start saving
+    setIsSaving(true);
     
     const finalImage = imagePreview || `https://picsum.photos/300/200?random=${Date.now()}`;
 
@@ -148,21 +165,13 @@ const FleetPage: React.FC<Props> = ({ currentUser }) => {
     }
 
     setCars(updatedCars);
-    
-    // Close modal and cleanup BEFORE long-running async tasks to ensure UI remains responsive
     setIsModalOpen(false);
-    setEditingCar(null);
-    setName('');
-    setBrand('');
-    setPlate('');
-    setImagePreview(null);
-    setPrices({});
 
     try {
         await setStoredData('cars', updatedCars);
     } catch (error) {
         console.error("Failed to save fleet data:", error);
-        alert("Data tersimpan lokal namun gagal sinkron ke cloud. Cek koneksi Anda.");
+        alert("Data tersimpan lokal namun gagal sinkron ke cloud.");
     } finally {
         setIsSaving(false);
     }
@@ -224,7 +233,6 @@ const FleetPage: React.FC<Props> = ({ currentUser }) => {
             Gaji_Driver: c.driverSalary,
             Status: c.status
         };
-        // Add all active packages to export columns
         settings.rentalPackages.forEach(pkg => {
             row[pkg] = c.pricing?.[pkg] || 0;
         });
@@ -233,14 +241,12 @@ const FleetPage: React.FC<Props> = ({ currentUser }) => {
     exportToExcel(dataToExport, `Data_Armada_${new Date().toISOString().split('T')[0]}`);
   };
   
-  // Added React.ChangeEvent type for file input event
   const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if(file) {
           importFromExcel(file, async (data) => {
               const imported: Car[] = data.map((d: any) => {
                   const dynamicPricing: {[key: string]: number} = {};
-                  // Dynamically map Excel columns to pricing packages
                   settings.rentalPackages.forEach(pkg => {
                       if (d[pkg] !== undefined) {
                           dynamicPricing[pkg] = Number(d[pkg]);
@@ -357,15 +363,16 @@ const FleetPage: React.FC<Props> = ({ currentUser }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCarsList.map(car => (
-            <div key={car.id} className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-xl transition-all group animate-in fade-in zoom-in-95 duration-200">
+            <div key={car.id} className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-xl transition-all group animate-in fade-in zoom-in-95 duration-200">
                 <div className="h-52 bg-slate-200 dark:bg-slate-900 relative overflow-hidden">
                     <img src={car.image} alt={car.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                     <div className="absolute top-3 left-3 flex flex-col gap-2">
                         <span className="bg-white/90 dark:bg-slate-800/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-black uppercase text-indigo-700 dark:text-indigo-400 shadow-sm">{car.type}</span>
                         {car.brand && <span className="bg-indigo-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase shadow-lg">{car.brand}</span>}
                     </div>
+                    <button onClick={() => showQR(car)} className="absolute top-3 right-3 bg-white/90 backdrop-blur p-2 rounded-xl text-slate-800 shadow-lg hover:bg-red-600 hover:text-white transition-all z-10"><QrCode size={20}/></button>
                     {car.partnerId && !isPartnerView && (
-                        <div className="absolute top-3 right-3 bg-yellow-400 text-yellow-900 text-[10px] font-black px-3 py-1 rounded-full flex items-center gap-1 shadow-md z-10 uppercase">
+                        <div className="absolute bottom-3 left-3 bg-yellow-400 text-yellow-900 text-[10px] font-black px-3 py-1 rounded-full flex items-center gap-1 shadow-md z-10 uppercase">
                             <UserIcon size={12} /> {partners.find(p => p.id === car.partnerId)?.name.split(' ')[0] || 'Investor'}
                         </div>
                     )}
@@ -373,7 +380,7 @@ const FleetPage: React.FC<Props> = ({ currentUser }) => {
                 <div className="p-6">
                     <div className="flex justify-between items-start mb-4">
                         <div>
-                            <h3 className="font-black text-xl text-slate-800 dark:text-white tracking-tight">{car.name}</h3>
+                            <h3 className="font-black text-xl text-slate-800 dark:text-white tracking-tight uppercase">{car.name}</h3>
                             <p className="text-sm text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-900 inline-block px-2 py-0.5 rounded mt-1 border border-slate-200 dark:border-slate-700">{car.plate}</p>
                         </div>
                         <div className="text-right">
@@ -468,6 +475,36 @@ const FleetPage: React.FC<Props> = ({ currentUser }) => {
                       )}
                       <div className="flex gap-3 pt-6 border-t dark:border-slate-700 mt-auto"><button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">Batal</button><button disabled={isUploading || isSaving} type="submit" className="flex-1 py-3 bg-indigo-600 text-white font-black uppercase tracking-widest rounded-xl hover:bg-indigo-700 shadow-xl disabled:opacity-50 active:scale-95 transition-transform">{isSaving ? 'Menyimpan...' : isUploading ? 'Proses...' : 'Simpan Data'}</button></div>
                   </form>
+              </div>
+          </div>
+      )}
+
+      {/* QR MODAL */}
+      {isQRModalOpen && selectedCarQR && (
+          <div className="fixed inset-0 bg-slate-900/90 z-[100] flex items-center justify-center p-6 backdrop-blur-md">
+              <div className="bg-white rounded-[3rem] p-10 flex flex-col items-center max-w-sm w-full animate-in zoom-in-95">
+                  <div className="mb-6 text-center">
+                      <h4 className="text-2xl font-black text-slate-800 uppercase tracking-tighter">{selectedCarQR.name}</h4>
+                      <p className="text-sm font-mono text-red-600 font-bold">{selectedCarQR.plate}</p>
+                  </div>
+                  <div className="bg-white p-4 rounded-3xl border-4 border-slate-100 shadow-inner mb-8">
+                      <img 
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(window.location.origin + '/#/booking?carId=' + selectedCarQR.id)}`} 
+                        className="w-56 h-56"
+                      />
+                  </div>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center mb-8">Admin dapat scan QR ini untuk otomatis memilih unit saat membuat booking baru.</p>
+                  <div className="flex flex-col gap-3 w-full">
+                    <div className="flex gap-3">
+                        <button onClick={() => window.print()} className="flex-1 py-3.5 bg-slate-800 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all active:scale-95">
+                            <Printer size={16}/> Cetak
+                        </button>
+                        <button onClick={handleDownloadQR} className="flex-1 py-3.5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all active:scale-95">
+                            <Download size={16}/> Download
+                        </button>
+                    </div>
+                    <button onClick={() => setIsQRModalOpen(false)} className="w-full py-3.5 bg-slate-100 text-slate-500 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-slate-200 transition-colors">Tutup</button>
+                  </div>
               </div>
           </div>
       )}

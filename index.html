@@ -13,7 +13,7 @@
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" href="logo-tab.png" />
     
-    <title>RentO - Management System</title>
+    <title>Wira Rent Car - Management System</title>
 
     <!-- Performance: Preconnect to critical domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -62,7 +62,9 @@
     "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
     "recharts": "https://esm.sh/recharts@^3.7.0",
     "vite": "https://esm.sh/vite@^7.3.1",
-    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "html5-qrcode": "https://esm.sh/html5-qrcode@2.3.8",
+    "@google/genai": "https://esm.sh/@google/genai@^1.39.0"
   }
 }
 </script>
@@ -70,7 +72,6 @@
   <body>
     <div id="root"></div>
     <script type="module">
-      // Register Service Worker for PWA
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));

@@ -9,9 +9,10 @@ import { User, AppSettings } from './types';
 import { Logo, LogoText } from './components/Logo';
 import { ThemeEngine } from './components/ThemeEngine';
 
-// Critical Pages - Static Import for Type Safety and Performance
+// Critical Pages
 import Dashboard from './pages/Dashboard';
 import LoginPage from './pages/LoginPage';
+import PublicRegistration from './pages/PublicRegistration';
 
 // Non-Critical Pages - Lazy Load
 const BookingPage = lazy(() => import('./pages/BookingPage'));
@@ -356,6 +357,7 @@ const App = () => {
     <Router>
       <Suspense fallback={<PageLoader />}>
         <Routes>
+          <Route path="/register" element={<PublicRegistration />} />
           <Route path="/login" element={!user ? <LoginPage onLogin={handleLogin} settings={settings} /> : <Navigate to="/" />} />
           
           <Route path="/" element={user ? <AppLayout user={user} settings={settings} onLogout={handleLogout}><Dashboard /></AppLayout> : <Navigate to="/login" />} />

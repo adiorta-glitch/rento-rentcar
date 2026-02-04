@@ -6,7 +6,8 @@ import {
   BookOpen, HelpCircle, ChevronUp, ChevronDown, Smartphone, 
   Share, PlusSquare, Activity, Shield, Calculator, Building, 
   Wallet, Zap, ReceiptText, Cloud, MessageCircle, ShieldCheck, 
-  Database, UserPlus, Car as CarIcon, Users, UserCog, ClipboardList
+  Database, UserPlus, Car as CarIcon, Users, UserCog, ClipboardList,
+  QrCode
 } from 'lucide-react';
 
 interface Props {
@@ -50,7 +51,7 @@ const HelpPage: React.FC<Props> = ({ currentUser }) => {
             </div>
             <div>
                 <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-100">Pusat Bantuan</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Panduan operasional dan manajemen sistem RENTO.</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Panduan operasional dan manajemen sistem Wira Rent Car.</p>
             </div>
         </div>
 
@@ -71,6 +72,44 @@ const HelpPage: React.FC<Props> = ({ currentUser }) => {
                     <h5 className="font-bold text-xs mb-3 uppercase tracking-widest text-indigo-200 flex items-center gap-2"><Share size={14}/> iOS / Safari</h5>
                     <p className="text-[11px] leading-relaxed">Klik tombol Share di Safari {' > '} Gulir ke bawah {' > '} Pilih <strong>"Add to Home Screen"</strong> (<PlusSquare size={12} className="inline"/>).</p>
                 </div>
+            </div>
+        </div>
+
+        {/* SPECIAL QUESTIONS SECTION */}
+        <div className="space-y-4">
+            <h4 className="font-black text-xs uppercase tracking-widest text-slate-400 dark:text-slate-500 flex items-center gap-2">
+                <Shield size={14}/> Registrasi & QR Code
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FaqItem 
+                    icon={Users}
+                    question="Bagaimana Cara Pelanggan Mendaftar Mandiri?" 
+                    answer={
+                        <div className="space-y-2">
+                            <p>Pelanggan dapat mendaftarkan identitasnya tanpa perlu akun login melalui Link Registrasi Publik.</p>
+                            <ol className="list-decimal pl-4 space-y-1">
+                                <li>Buka menu <strong>"Data Pelanggan"</strong>.</li>
+                                <li>Klik tombol <strong>"Link Daftar"</strong> di header untuk menyalin URL.</li>
+                                <li>Kirimkan link tersebut ke pelanggan via WhatsApp.</li>
+                                <li>Pelanggan mengisi form & upload KTP di HP mereka.</li>
+                                <li>Data akan masuk ke tab <strong>"Menunggu Approval"</strong> untuk Anda verifikasi.</li>
+                            </ol>
+                        </div>
+                    }
+                />
+                <FaqItem 
+                    icon={QrCode}
+                    question="Di Mana Mencari & Menggunakan Kode QR?" 
+                    answer={
+                        <div className="space-y-2">
+                            <p>Sistem QR digunakan untuk mempercepat pemilihan unit saat pembuatan booking.</p>
+                            <ul className="list-disc pl-4 space-y-1">
+                                <li><strong>Mencetak QR:</strong> Buka menu <strong>"Armada Mobil"</strong>, klik ikon QR di pojok kanan atas gambar mobil. Anda bisa Cetak atau Download gambar QR untuk ditempel di dashboard mobil.</li>
+                                <li><strong>Scan QR:</strong> Buka menu <strong>"Booking & Jadwal"</strong>, klik ikon QR di header. Arahkan kamera ke QR mobil, dan sistem akan otomatis memilih mobil tersebut dalam form input baru.</li>
+                            </ul>
+                        </div>
+                    }
+                />
             </div>
         </div>
 
@@ -233,7 +272,7 @@ const HelpPage: React.FC<Props> = ({ currentUser }) => {
         </div>
 
         <div className="text-center pt-4">
-            <p className="text-[10px] text-slate-400 dark:text-slate-600 font-medium uppercase tracking-[0.2em]">RENTO Management System • Version 2.1.0 (PRO)</p>
+            <p className="text-[10px] text-slate-400 dark:text-slate-600 font-medium uppercase tracking-[0.2em]">Wira Rent Car Management System • Version 2.1.0 (PRO)</p>
         </div>
     </div>
   );

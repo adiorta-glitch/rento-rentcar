@@ -1,3 +1,4 @@
+
 export enum BookingStatus {
   BOOKED = 'Booked',
   ACTIVE = 'Active',
@@ -12,7 +13,6 @@ export enum PaymentStatus {
   PAID = 'Lunas'
 }
 
-// Updated Roles based on requirement
 export type UserRole = 'superadmin' | 'admin' | 'driver' | 'partner';
 
 export interface User {
@@ -20,19 +20,17 @@ export interface User {
   username: string;
   password?: string;
   name: string;
-  email?: string; // New: Login by Email
-  phone?: string; // New: Login by Phone
+  email?: string;
+  phone?: string;
   role: UserRole;
-  linkedDriverId?: string; // If role is driver
-  linkedPartnerId?: string; // If role is partner
-  
-  // New Profile Features
+  linkedDriverId?: string;
+  linkedPartnerId?: string;
   image?: string | null;
 }
 
 export interface AppSettings {
   companyName: string;
-  displayName: string; // New: Short Display Name
+  displayName: string;
   tagline: string;
   address: string;
   phone: string;
@@ -40,31 +38,19 @@ export interface AppSettings {
   website: string;
   invoiceFooter: string;
   logoUrl?: string | null;
-  stampUrl?: string | null; // New: Corporate Stamp Image
-  
-  // Theme Settings
-  themeColor: string; // 'red', 'blue', 'green', 'purple', 'orange', 'black'
+  stampUrl?: string | null;
+  themeColor: string;
   darkMode: boolean;
-
-  // New Settings for Invoice Text
   paymentTerms: string;
   termsAndConditions: string;
-  
-  // WhatsApp Template
   whatsappTemplate: string;
-  
-  // Master Data
   carCategories: string[];
   rentalPackages: string[];
-
-  // Overtime Settings
   overtimeType: 'Percentage' | 'Nominal';
   overtimeValue: number;
-
-  // GPS Integration
   gpsProvider: 'Simulation' | 'Traccar' | 'Custom';
   gpsApiUrl?: string;
-  gpsApiToken?: string; // Basic Auth or Bearer Token
+  gpsApiToken?: string;
 }
 
 export interface Customer {
@@ -72,20 +58,23 @@ export interface Customer {
   name: string;
   phone: string;
   address: string;
-  idCardImage?: string; // Optional Foto KTP
+  nik?: string;
+  idCardImage?: string;
+  status?: 'Pending' | 'Approved';
+  createdAt?: number;
 }
 
 export interface Partner {
   id: string;
   name: string;
   phone: string;
-  splitPercentage: number; // Keep for legacy, but UI will prefer Car.investorSetoran
+  splitPercentage: number;
   image?: string;
 }
 
 export interface Vendor {
   id: string;
-  name: string; // Nama Rental Rekanan
+  name: string;
   phone: string;
   address: string;
   image?: string;
@@ -95,7 +84,7 @@ export interface Driver {
   id: string;
   name: string;
   phone: string;
-  dailyRate: number; // Deprecated by Car.driverSalary but kept for fallback
+  dailyRate: number;
   status: 'Active' | 'Inactive';
   image: string;
 }
@@ -111,32 +100,24 @@ export interface HighSeason {
 export interface Car {
   id: string;
   name: string;
-  brand?: string; // New: Merek Mobil (Toyota, Honda, etc)
+  brand?: string;
   plate: string;
   type: string;
-  
-  // New: Dynamic Pricing Map (Package Name -> Price)
   pricing: { [packageName: string]: number };
-  
-  // New: Fixed Financial Schemas
-  investorSetoran: number; // Setoran fixed ke investor per hari
-  driverSalary: number;    // Gaji driver fixed untuk mobil ini per hari
-  
+  investorSetoran: number;
+  driverSalary: number;
   price12h?: number; 
   price24h?: number;
-  
   image: string;
   partnerId?: string | null;
   status: 'Available' | 'Unavailable';
-
-  // GPS Integration
-  gpsDeviceId?: string; // IMEI or Unique ID in GPS System
+  gpsDeviceId?: string;
 }
 
 export interface VehicleChecklist {
   odometer: number;
-  fuelLevel: string; // e.g. "50%", "Full", "Bar 3"
-  speedometerImage: string; // Required
+  fuelLevel: string;
+  speedometerImage: string;
   physicalImages: {
     front?: string;
     back?: string;
@@ -150,60 +131,41 @@ export interface VehicleChecklist {
 
 export interface Booking {
   id: string;
-  carId: string; // Optional if Rent to Rent, but keeping string to avoid break, use logic to ignore if isRentToRent
-  
-  // Rent to Rent Fields
+  carId: string;
   isRentToRent?: boolean;
-  vendorId?: string; // ID Rental Rekanan
-  externalCarName?: string; // Nama Mobil Luar
-  externalCarPlate?: string; // Plat Mobil Luar
-  vendorFee?: number; // Biaya sewa ke vendor (HPP)
-
+  vendorId?: string;
+  externalCarName?: string;
+  externalCarPlate?: string;
+  vendorFee?: number;
   driverId?: string;
-  customerId?: string; // Link to Customer DB
-  customerName: string; // Fallback / Cache
-  customerPhone: string; // Fallback / Cache
-  
+  customerId?: string;
+  customerName: string;
+  customerPhone: string;
   startDate: string;
   endDate: string;
-  
-  // New: Actual Return for Overtime calculation
   actualReturnDate?: string; 
-  
-  packageType: string; // Updated to dynamic string
-  
-  // New Fields
+  packageType: string;
   destination: 'Dalam Kota' | 'Luar Kota';
-  
-  // Deposit Details
   securityDepositType: 'Uang' | 'Barang';
-  securityDepositValue: number; // Nominal uang atau estimasi nilai barang (opsional)
-  securityDepositDescription: string; // Keterangan barang (misal: KTP Asli + Motor Beat)
+  securityDepositValue: number;
+  securityDepositDescription: string;
   securityDepositImage?: string;
-
-  // Vehicle Checklist (Serah Terima)
   checklist?: VehicleChecklist;
-
-  // Financials
   basePrice: number;
   driverFee: number;
   highSeasonFee: number;
   deliveryFee: number;
-  overtimeFee?: number; // Denda Keterlambatan
-  extraCost?: number; // New: Biaya Tambahan (BBM, Kerusakan, dll)
-  extraCostDescription?: string; // New: Keterangan Biaya Tambahan
-  discount?: number; // New: Diskon Manual
-  
+  overtimeFee?: number;
+  extraCost?: number;
+  extraCostDescription?: string;
+  discount?: number;
   totalPrice: number;
   amountPaid: number;
-  
   status: BookingStatus;
   paymentStatus: PaymentStatus;
-  
-  notes: string; // Internal/General Note
-  customerNote?: string; // Catatan khusus di Nota
-  driverNote?: string;   // Catatan khusus di SPJ Driver
-
+  notes: string;
+  customerNote?: string;
+  driverNote?: string;
   createdAt: number;
 }
 
@@ -212,12 +174,10 @@ export interface Transaction {
   date: string;
   amount: number;
   type: 'Income' | 'Expense';
-  category: string; // E.g., 'Rental Payment', 'Fuel', 'Service', 'Gaji Driver'
+  category: string;
   description: string;
   bookingId?: string;
-  receiptImage?: string; // New: Bukti Nota
-  
-  // New for Reimbursement Logic
+  receiptImage?: string;
   status?: 'Pending' | 'Paid'; 
-  relatedId?: string; // Links to Driver ID or Partner ID or Vendor ID
+  relatedId?: string;
 }
