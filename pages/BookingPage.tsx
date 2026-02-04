@@ -270,14 +270,20 @@ const BookingPage: React.FC<Props> = ({ currentUser }) => {
 
   const handleQRScan = (decodedText: string) => {
     try {
-        const url = new URL(decodedText.startsWith('http') ? decodedText : `https://x.y/${decodedText}`);
-        const scanId = url.searchParams.get('carId');
+        // Gunakan Regex untuk ekstraksi ID kendaraan yang lebih handal dari URL HashRouter
+        const carIdMatch = decodedText.match(/[?&]carId=([^&]+)/);
+        const scanId = carIdMatch ? carIdMatch[1] : null;
+
         if (scanId) {
             setSelectedCarId(scanId);
             setActiveTab('create');
             setIsScannerOpen(false);
-        } else alert("QR Code tidak valid.");
-    } catch (e) { alert("Gagal membaca kode QR."); }
+        } else {
+            alert("QR Code tidak valid. Pastikan ini adalah QR unit armada resmi.");
+        }
+    } catch (e) {
+        alert("Gagal membaca kode QR.");
+    }
   };
 
   const handleCreateBooking = (e: React.FormEvent) => {
