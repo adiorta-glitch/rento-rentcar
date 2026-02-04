@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AppSettings, Customer, Car, Booking, BookingStatus, PaymentStatus } from '../types';
 import { getStoredData, setStoredData, DEFAULT_SETTINGS, compressImage } from '../services/dataService';
-import { Camera, CheckCircle, Send, User, CreditCard, MapPin, Phone, ShieldCheck, Car as CarIcon, Calendar, Clock, ChevronRight, Search, UserPlus, UserCheck, AlertTriangle, Filter, MessageSquare } from 'lucide-react';
+import { Camera, CheckCircle, Send, User, CreditCard, MapPin, Phone, ShieldCheck, Car as CarIcon, Calendar, Clock, ChevronRight, Search, UserPlus, UserCheck, AlertTriangle, Filter, MessageSquare, ChevronLeft } from 'lucide-react';
 import { Logo } from '../components/Logo';
 
 const PublicRegistration = () => {
@@ -110,6 +110,13 @@ const PublicRegistration = () => {
       return filtered;
   }, [cars, bookings, startDate, startTime, endDate, endTime, carSearch, carTypeFilter, step]);
 
+  const durationDays = useMemo(() => {
+      const start = new Date(`${startDate}T${startTime}`);
+      const end = new Date(`${endDate}T${endTime}`);
+      const diffMs = end.getTime() - start.getTime();
+      return Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+  }, [startDate, startTime, endDate, endTime]);
+
   const nextStep = () => {
       if (step === 1) {
           if (regType === 'existing' && !verifiedCustomer) {
@@ -165,10 +172,8 @@ const PublicRegistration = () => {
     const car = cars.find(c => c.id === selectedCarId);
     const start = new Date(`${startDate}T${startTime}`);
     const end = new Date(`${endDate}T${endTime}`);
-    const diffMs = end.getTime() - start.getTime();
-    const days = Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
     
-    const basePrice = (car?.pricing?.['24 Jam (Dalam Kota)'] || car?.price24h || 0) * days;
+    const basePrice = (car?.pricing?.['24 Jam (Dalam Kota)'] || car?.price24h || 0) * durationDays;
 
     const newBooking: Booking = {
         id: `pub-${Date.now()}`,
@@ -233,9 +238,9 @@ const PublicRegistration = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900 pb-24">
+    <div className="min-h-screen bg-white dark:bg-slate-900 pb-32">
         {/* Header & Stepper */}
-        <div className="p-6 border-b dark:border-slate-800 flex flex-col gap-6 bg-white dark:bg-slate-900 sticky top-0 z-30 shadow-sm">
+        <div className="p-6 border-b dark:border-slate-800 flex flex-col gap-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md sticky top-0 z-40 shadow-sm">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center p-1.5 shadow-lg shadow-red-200"><Logo src={settings.logoUrl}/></div>
@@ -252,32 +257,31 @@ const PublicRegistration = () => {
             </div>
             
             <div className="flex items-center justify-between px-2">
-                <div className={`text-[10px] font-black uppercase tracking-widest ${step === 1 ? 'text-red-600' : 'text-slate-300'}`}>1. Identitas</div>
-                <div className={`text-[10px] font-black uppercase tracking-widest ${step === 2 ? 'text-red-600' : 'text-slate-300'}`}>2. Jadwal</div>
-                <div className={`text-[10px] font-black uppercase tracking-widest ${step === 3 ? 'text-red-600' : 'text-slate-300'}`}>3. Armada</div>
+                <div className={`text-[9px] font-black uppercase tracking-widest ${step === 1 ? 'text-red-600' : 'text-slate-300'}`}>1. Identitas</div>
+                <div className={`text-[9px] font-black uppercase tracking-widest ${step === 2 ? 'text-red-600' : 'text-slate-300'}`}>2. Jadwal</div>
+                <div className={`text-[9px] font-black uppercase tracking-widest ${step === 3 ? 'text-red-600' : 'text-slate-300'}`}>3. Armada</div>
             </div>
         </div>
 
-        <div className="max-w-xl mx-auto px-6 py-8">
+        <div className="max-w-xl mx-auto px-6 py-6">
             <form onSubmit={handleSubmit}>
                 {/* STEP 1: IDENTITY */}
                 {step === 1 && (
                     <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
-                        {/* Tab Switcher */}
                         <div className="flex p-1.5 bg-slate-100 dark:bg-slate-800 rounded-[1.25rem] border border-slate-200 dark:border-slate-700 shadow-inner">
                             <button 
                                 type="button" 
                                 onClick={() => { setRegType('new'); setVerifiedCustomer(null); }}
                                 className={`flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${regType === 'new' ? 'bg-white dark:bg-slate-700 text-red-600 shadow-md' : 'text-slate-500'}`}
                             >
-                                <UserPlus size={16}/> Pelanggan Baru
+                                <UserPlus size={16}/> Baru
                             </button>
                             <button 
                                 type="button" 
                                 onClick={() => setRegType('existing')}
                                 className={`flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${regType === 'existing' ? 'bg-white dark:bg-slate-700 text-red-600 shadow-md' : 'text-slate-500'}`}
                             >
-                                <UserCheck size={16}/> Sudah Terdaftar
+                                <UserCheck size={16}/> Terdaftar
                             </button>
                         </div>
 
@@ -428,20 +432,22 @@ const PublicRegistration = () => {
 
                 {/* STEP 3: VEHICLE GALLERY */}
                 {step === 3 && (
-                    <div className="space-y-8 animate-in slide-in-from-right-4 duration-500">
-                        <div className="flex flex-col gap-2">
-                            <h3 className="font-black text-slate-800 dark:text-white uppercase tracking-tighter text-xl">Pilih Kendaraan Ready</h3>
-                            <p className="text-xs text-slate-500 font-medium">Daftar unit yang tersedia pada periode {new Date(startDate).toLocaleDateString()} - {new Date(endDate).toLocaleDateString()}</p>
+                    <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
+                        <div className="flex items-center justify-between mb-2">
+                            <div>
+                                <h3 className="font-black text-slate-800 dark:text-white uppercase tracking-tighter text-xl leading-none">Pilih Armada</h3>
+                                <p className="text-[10px] text-slate-500 font-bold uppercase mt-2 tracking-widest">Ready Periode: {new Date(startDate).toLocaleDateString()} - {new Date(endDate).toLocaleDateString()}</p>
+                            </div>
                         </div>
 
                         {/* Search & Category Filter */}
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                             <div className="relative">
                                 <Search size={18} className="absolute left-4 top-3.5 text-slate-400" />
                                 <input 
                                     type="text" 
-                                    placeholder="Cari model mobil (Avanza, Xpander...)" 
-                                    className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-2xl p-4 pl-12 text-sm font-bold dark:text-white focus:ring-2 ring-red-500 transition-all"
+                                    placeholder="Cari mobil..." 
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl p-4 pl-12 text-sm font-bold dark:text-white focus:ring-2 ring-red-500 transition-all shadow-inner"
                                     value={carSearch}
                                     onChange={e => setCarSearch(e.target.value)}
                                 />
@@ -451,7 +457,7 @@ const PublicRegistration = () => {
                                 <button 
                                     type="button"
                                     onClick={() => setCarTypeFilter('All')}
-                                    className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border-2 ${carTypeFilter === 'All' ? 'bg-slate-800 border-slate-800 text-white shadow-md' : 'bg-white border-slate-200 text-slate-400'}`}
+                                    className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border-2 ${carTypeFilter === 'All' ? 'bg-slate-800 border-slate-800 text-white shadow-md' : 'bg-white border-slate-200 text-slate-400'}`}
                                 >
                                     Semua
                                 </button>
@@ -460,7 +466,7 @@ const PublicRegistration = () => {
                                         key={cat}
                                         type="button"
                                         onClick={() => setCarTypeFilter(cat)}
-                                        className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border-2 ${carTypeFilter === cat ? 'bg-slate-800 border-slate-800 text-white shadow-md' : 'bg-white border-slate-200 text-slate-400'}`}
+                                        className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border-2 ${carTypeFilter === cat ? 'bg-slate-800 border-slate-800 text-white shadow-md' : 'bg-white border-slate-200 text-slate-400'}`}
                                     >
                                         {cat}
                                     </button>
@@ -468,13 +474,11 @@ const PublicRegistration = () => {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-12">
                             {availableCars.length === 0 ? (
                                 <div className="col-span-full py-16 text-center bg-slate-50 dark:bg-slate-800 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700">
-                                    <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <CarIcon size={32} className="text-slate-300 dark:text-slate-500"/>
-                                    </div>
-                                    <p className="text-slate-500 dark:text-slate-400 font-bold px-6">Maaf, unit tidak ditemukan atau sudah terbooking pada jadwal ini.</p>
+                                    <CarIcon size={32} className="mx-auto text-slate-300 mb-4 opacity-50"/>
+                                    <p className="text-slate-500 dark:text-slate-400 font-bold px-6 text-sm">Maaf, unit tidak ditemukan atau sudah terbooking.</p>
                                     <button type="button" onClick={() => { setCarSearch(''); setCarTypeFilter('All'); }} className="text-red-600 font-black uppercase text-[10px] mt-4 tracking-widest underline">Reset Filter</button>
                                 </div>
                             ) : (
@@ -482,27 +486,27 @@ const PublicRegistration = () => {
                                     <div 
                                         key={car.id} 
                                         onClick={() => setSelectedCarId(car.id)}
-                                        className={`group relative rounded-[2rem] overflow-hidden border-4 transition-all duration-300 cursor-pointer ${selectedCarId === car.id ? 'border-red-600 scale-[1.02] shadow-2xl' : 'border-transparent bg-slate-50 dark:bg-slate-800'}`}
+                                        className={`group relative rounded-3xl overflow-hidden border-4 transition-all duration-300 cursor-pointer ${selectedCarId === car.id ? 'border-red-600 scale-[1.02] shadow-xl' : 'border-transparent bg-slate-50 dark:bg-slate-800'}`}
                                     >
-                                        <div className="aspect-[4/3] overflow-hidden">
+                                        <div className="aspect-video overflow-hidden">
                                             <img src={car.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                         </div>
-                                        <div className="p-5 bg-gradient-to-t from-black/80 via-black/40 to-transparent absolute inset-0 flex flex-col justify-end text-white">
-                                            <div className="flex justify-between items-end">
+                                        <div className="p-4 bg-white dark:bg-slate-800 border-t dark:border-slate-700">
+                                            <div className="flex justify-between items-start">
                                                 <div>
-                                                    <span className="text-[8px] font-black uppercase tracking-widest bg-red-600 px-2 py-0.5 rounded mb-1 inline-block">{car.type}</span>
-                                                    <h4 className="font-black text-lg uppercase leading-tight">{car.name}</h4>
-                                                    <p className="text-[10px] font-mono opacity-80">{car.plate}</p>
+                                                    <span className="text-[8px] font-black uppercase tracking-widest bg-red-100 text-red-600 px-2 py-0.5 rounded mb-1 inline-block">{car.type}</span>
+                                                    <h4 className="font-black text-sm uppercase leading-tight text-slate-800 dark:text-white">{car.name}</h4>
+                                                    <p className="text-[9px] font-mono text-slate-400">{car.plate}</p>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="text-[8px] font-bold uppercase opacity-70">Harga / Hari</p>
-                                                    <p className="font-black text-sm">Rp {(car.pricing?.['24 Jam (Dalam Kota)'] || car.price24h || 0).toLocaleString()}</p>
+                                                    <p className="text-[8px] font-bold uppercase text-slate-400">Harga/Hari</p>
+                                                    <p className="font-black text-sm text-red-600">Rp {(car.pricing?.['24 Jam (Dalam Kota)'] || car.price24h || 0).toLocaleString()}</p>
                                                 </div>
                                             </div>
                                         </div>
                                         {selectedCarId === car.id && (
-                                            <div className="absolute top-4 right-4 bg-red-600 text-white p-1.5 rounded-full shadow-lg">
-                                                <CheckCircle size={20}/>
+                                            <div className="absolute top-3 right-3 bg-red-600 text-white p-1 rounded-full shadow-lg border-2 border-white">
+                                                <CheckCircle size={18}/>
                                             </div>
                                         )}
                                     </div>
@@ -510,33 +514,41 @@ const PublicRegistration = () => {
                             )}
                         </div>
 
-                        {selectedCarId && (
-                            <div className="p-6 bg-slate-900 rounded-[2rem] text-white animate-in zoom-in-95 duration-300 shadow-2xl">
-                                <h4 className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-4 flex items-center gap-2">
-                                    <CheckCircle size={14}/> Ringkasan Pengajuan
-                                </h4>
-                                <div className="space-y-3 text-sm">
-                                    <div className="flex justify-between border-b border-white/10 pb-2">
-                                        <span className="text-slate-400">Unit Terpilih</span>
-                                        <span className="font-bold uppercase text-red-400">{cars.find(c => c.id === selectedCarId)?.name}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-400">Total Durasi</span>
-                                        <span className="font-bold">{Math.max(1, Math.ceil((new Date(`${endDate}T${endTime}`).getTime() - new Date(`${startDate}T${startTime}`).getTime()) / (1000 * 60 * 60 * 24)))} Hari</span>
-                                    </div>
+                        {/* STICKY BOTTOM ACTION BAR */}
+                        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 z-50 animate-in slide-in-from-bottom-full duration-500">
+                            <div className="max-w-xl mx-auto flex items-center gap-4">
+                                <button 
+                                    type="button" 
+                                    onClick={prevStep} 
+                                    className="p-4 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-2xl flex items-center justify-center transition-all active:scale-95"
+                                >
+                                    <ChevronLeft size={24}/>
+                                </button>
+                                
+                                <div className="flex-1">
+                                    {!selectedCarId ? (
+                                        <div className="text-center md:text-left">
+                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Pilih satu unit armada</p>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col animate-in fade-in slide-in-from-left-2">
+                                            <span className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-0.5">Unit Terpilih:</span>
+                                            <p className="text-sm font-black text-slate-800 dark:text-white uppercase truncate max-w-[150px] sm:max-w-xs leading-none">
+                                                {cars.find(c => c.id === selectedCarId)?.name}
+                                            </p>
+                                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter mt-0.5">Durasi: {durationDays} Hari</p>
+                                        </div>
+                                    )}
                                 </div>
-                            </div>
-                        )}
 
-                        <div className="flex gap-4">
-                            <button type="button" onClick={prevStep} className="flex-1 py-5 rounded-3xl font-black uppercase tracking-widest text-xs bg-slate-100 text-slate-500">Ganti Jadwal</button>
-                            <button 
-                                type="submit" 
-                                disabled={!selectedCarId}
-                                className="flex-[2] bg-red-600 disabled:bg-slate-300 hover:bg-red-700 text-white py-5 rounded-3xl font-black uppercase tracking-widest shadow-xl flex items-center justify-center gap-3 transition-all active:scale-95"
-                            >
-                                <Send size={20}/> Ajukan Sekarang
-                            </button>
+                                <button 
+                                    type="submit" 
+                                    disabled={!selectedCarId}
+                                    className="flex-[2] sm:flex-1 bg-red-600 disabled:bg-slate-300 disabled:opacity-50 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-red-200 dark:shadow-none flex items-center justify-center gap-2 transition-all active:scale-95"
+                                >
+                                    <Send size={18}/> Ajukan
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}
