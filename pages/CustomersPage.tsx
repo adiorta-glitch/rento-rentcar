@@ -238,7 +238,7 @@ const CustomersPage: React.FC<Props> = ({ currentUser }) => {
                   <div className="flex justify-between items-center mb-8 border-b dark:border-slate-700 pb-6">
                       <div>
                           <h3 className="text-3xl font-black text-slate-800 dark:text-white tracking-tighter uppercase">{editingCustomer ? 'Edit Profil' : 'Daftarkan Pelanggan'}</h3>
-                          <p className="text-slate-400 text-sm font-bold uppercase tracking-widest">Wira Rent Car Database</p>
+                          <p className="text-slate-400 text-sm font-bold uppercase tracking-widest">RENTO Database</p>
                       </div>
                       <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-red-600 bg-slate-100 dark:bg-slate-700 rounded-full p-2 transition-colors"><X size={28}/></button>
                   </div>

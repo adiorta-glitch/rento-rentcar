@@ -55,7 +55,7 @@ const PublicRegistration = () => {
                   <CheckCircle size={56} />
               </div>
               <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight mb-2">Pendaftaran Berhasil</h2>
-              <p className="text-slate-500 max-w-xs mx-auto">Terima kasih Kak {name}. Data Anda telah terkirim dan sedang menunggu persetujuan Admin Wira Rent Car.</p>
+              <p className="text-slate-500 max-w-xs mx-auto">Terima kasih Kak {name}. Data Anda telah terkirim dan sedang menunggu persetujuan Admin RENTO.</p>
               <p className="text-[10px] text-slate-400 mt-8">Anda dapat menutup halaman ini sekarang.</p>
           </div>
       );
@@ -131,7 +131,7 @@ const PublicRegistration = () => {
                     <Send size={24}/> Kirim Pendaftaran
                 </button>
                 
-                <p className="text-[9px] text-center text-slate-400 leading-relaxed uppercase font-bold tracking-widest px-4">Dengan mengirim data ini, saya setuju dengan seluruh syarat dan ketentuan sewa yang berlaku di Wira Rent Car.</p>
+                <p className="text-[9px] text-center text-slate-400 leading-relaxed uppercase font-bold tracking-widest px-4">Dengan mengirim data ini, saya setuju dengan seluruh syarat dan ketentuan sewa yang berlaku di RENTO.</p>
             </form>
         </div>
     </div>

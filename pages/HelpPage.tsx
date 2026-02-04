@@ -51,7 +51,7 @@ const HelpPage: React.FC<Props> = ({ currentUser }) => {
             </div>
             <div>
                 <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-100">Pusat Bantuan</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Panduan operasional dan manajemen sistem Wira Rent Car.</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Panduan operasional dan manajemen sistem RENTO.</p>
             </div>
         </div>
 
@@ -272,7 +272,7 @@ const HelpPage: React.FC<Props> = ({ currentUser }) => {
         </div>
 
         <div className="text-center pt-4">
-            <p className="text-[10px] text-slate-400 dark:text-slate-600 font-medium uppercase tracking-[0.2em]">Wira Rent Car Management System • Version 2.1.0 (PRO)</p>
+            <p className="text-[10px] text-slate-400 dark:text-slate-600 font-medium uppercase tracking-[0.2em]">RENTO Rent Car Management System • Version 2.1.0 (PRO)</p>
         </div>
     </div>
   );

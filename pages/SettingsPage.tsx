@@ -297,7 +297,7 @@ const SettingsPage: React.FC<Props> = ({ currentUser }) => {
                      </div>
                      <div>
                          <label className="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Nama Display Aplikasi (Singkat)</label>
-                         <input name="displayName" value={settings.displayName} onChange={handleChange} className="w-full border dark:border-slate-700 dark:bg-slate-900 dark:text-white rounded-xl p-3 font-bold" placeholder="Contoh: WiraRentCar" />
+                         <input name="displayName" value={settings.displayName} onChange={handleChange} className="w-full border dark:border-slate-700 dark:bg-slate-900 dark:text-white rounded-xl p-3 font-bold" placeholder="Contoh: RentoRentCar" />
                      </div>
                      <div className="md:col-span-2">
                          <label className="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Tagline / Slogan</label>
