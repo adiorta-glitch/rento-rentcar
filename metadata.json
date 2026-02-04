@@ -1,7 +1,7 @@
 
 {
   "name": "RENTO",
-  "description": "Sistem Manajemen Rental Mobil Profesional & Terintegrasi",
+  "description": "Sistem Manajemen Rental Kendaraan Profesional & Terintegrasi",
   "requestFramePermissions": [
     "camera",
     "geolocation"

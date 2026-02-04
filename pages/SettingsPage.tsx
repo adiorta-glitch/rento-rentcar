@@ -402,7 +402,7 @@ const SettingsPage: React.FC<Props> = ({ currentUser }) => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div>
-                          <h3 className="font-black text-sm mb-4 flex items-center gap-2 text-slate-800 dark:text-white uppercase tracking-widest"><List size={18} className="text-red-600"/> Kategori Mobil</h3>
+                          <h3 className="font-black text-sm mb-4 flex items-center gap-2 text-slate-800 dark:text-white uppercase tracking-widest"><List size={18} className="text-red-600"/> Kategori Kendaraan</h3>
                           <div className="flex gap-2 mb-4">
                               <input 
                                 className="border dark:border-slate-700 dark:bg-slate-900 dark:text-white rounded-xl p-2.5 flex-1 font-bold text-sm" 

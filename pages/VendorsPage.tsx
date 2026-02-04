@@ -124,7 +124,7 @@ const VendorsPage = () => {
     if (!historyVendor) return;
     const historyData = vendorHistoryData.trips.map(t => ({
         Tanggal: new Date(t.startDate).toLocaleDateString('id-ID'),
-        Mobil_Vendor: t.externalCarName,
+        Kendaraan_Vendor: t.externalCarName,
         Nopol: t.externalCarPlate,
         Customer: t.customerName,
         HPP_Vendor: t.vendorFee,

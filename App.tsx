@@ -154,7 +154,7 @@ const AppLayout = ({ children, user, settings, onLogout }: AppLayoutProps) => {
                 <div className="mb-6">
                     <h3 className="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Master Data</h3>
                     <div className="space-y-1">
-                        <SidebarItem to="/fleet" icon={Car} label="Armada Mobil" />
+                        <SidebarItem to="/fleet" icon={Car} label="Armada Kendaraan" />
                         <SidebarItem to="/customers" icon={Users} label="Data Pelanggan" />
                         <SidebarItem to="/drivers" icon={UserCircle} label="Data Driver" />
                         <SidebarItem to="/partners" icon={UserCog} label="Investor & Rekanan" />

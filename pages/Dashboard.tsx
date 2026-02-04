@@ -9,9 +9,9 @@ import { AlertCircle, CheckCircle, TrendingUp, Car as CarIcon, Clock, ChevronLef
 import { Link, useNavigate } from 'react-router-dom';
 import { Logo } from '../components/Logo';
 
-// --- MOBILE COMPONENTS ---
+// --- KendaraanE COMPONENTS ---
 
-const MobileHeader = ({ user, settings }: { user: any, settings: AppSettings }) => (
+const KendaraaneHeader = ({ user, settings }: { user: any, settings: AppSettings }) => (
     <div className="flex items-center justify-between mb-6">
         <div>
              <h1 className="font-bold text-slate-800 text-lg leading-tight">Halo, {user?.name?.split(' ')[0]} 👋</h1>
@@ -55,7 +55,7 @@ const Dashboard = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedCarFilter, setSelectedCarFilter] = useState<string>('All');
 
-  // Mobile Menu State
+  // Kendaraane Menu State
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -186,12 +186,12 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6 pb-20 md:pb-0">
-      {/* Mobile Header (Hidden on Desktop) */}
+      {/* Kendaraane Header (Hidden on Desktop) */}
       <div className="md:hidden">
-          <MobileHeader user={user} settings={settings} />
+          <KendaraaneHeader user={user} settings={settings} />
       </div>
 
-      {/* Mobile Quick Actions Grid */}
+      {/* Kendaraane Quick Actions Grid */}
       <div className="md:hidden">
           <h3 className="font-bold text-slate-800 mb-3">Menu Cepat</h3>
           <div className="grid grid-cols-4 gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
@@ -282,7 +282,7 @@ const Dashboard = () => {
                           value={selectedCarFilter}
                           onChange={e => setSelectedCarFilter(e.target.value)}
                       >
-                          <option value="All">Semua Mobil</option>
+                          <option value="All">Semua Kendaraan</option>
                           {/* LIST CARS BASED ON ROLE (Admin=All, Partner=MyCars) */}
                           {myCars.map(c => (
                               <option key={c.id} value={c.id}>{c.name} - {c.plate}</option>

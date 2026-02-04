@@ -91,7 +91,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, settings }) => {
       {/* --- RIGHT SIDE: FORM LOGIN (40%) --- */}
       <div className="w-full lg:w-[40%] xl:w-[35%] flex flex-col justify-center px-8 sm:px-12 py-12 relative z-20 bg-slate-900/90 backdrop-blur-xl border-l border-slate-800 shadow-2xl h-screen overflow-y-auto custom-scrollbar">
           
-          {/* Mobile Logo (Only visible on small screens) */}
+          {/* Kendaraane Logo (Only visible on small screens) */}
           <div className="lg:hidden flex justify-center mb-8">
              <div className="w-24 h-24 bg-slate-800 rounded-2xl flex items-center justify-center border border-slate-700 shadow-lg relative group">
                  <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl blur opacity-30"></div>

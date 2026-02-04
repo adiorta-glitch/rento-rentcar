@@ -499,7 +499,7 @@ const ExpensesPage: React.FC<Props> = ({ isDriverView = false, isPartnerView = f
                                     <option value="Gaji">Gaji Driver / Karyawan</option>
                                     <option value="BBM">BBM / Bensin</option>
                                     <option value="Tol/Parkir">Tol & Parkir</option>
-                                    <option value="Service">Service Mobil</option>
+                                    <option value="Service">Service Kendaraan</option>
                                     <option value="Marketing">Marketing / Iklan</option>
                                     <option value="Reimbursement">Reimbursement</option>
                                     <option value="Lainnya">Pengeluaran Lainnya</option>

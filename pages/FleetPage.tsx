@@ -178,7 +178,7 @@ const FleetPage: React.FC<Props> = ({ currentUser }) => {
   };
 
   const handleDelete = async (id: string) => {
-      if(window.confirm('Hapus data armada mobil ini secara permanen?')) {
+      if(window.confirm('Hapus data Armada Kendaraan ini secara permanen?')) {
           const updated = cars.filter(c => c.id !== id);
           setCars(updated);
           await setStoredData('cars', updated);
@@ -255,7 +255,7 @@ const FleetPage: React.FC<Props> = ({ currentUser }) => {
 
                   return {
                       id: d.ID || d.id || `imp-${Date.now()}-${Math.random()}`,
-                      name: d.Nama || d.nama_mobil || d.nama || 'Tanpa Nama',
+                      name: d.Nama || d.nama_Kendaraan || d.nama || 'Tanpa Nama',
                       brand: d.Merek || d.merek || '',
                       plate: d.Plat || d.plat_nomor || d.plat || '-',
                       type: d.Kategori || d.kategori || 'MPV',
@@ -280,7 +280,7 @@ const FleetPage: React.FC<Props> = ({ currentUser }) => {
       <div className="sticky top-0 z-20 -mx-4 md:-mx-8 px-4 md:px-8 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 shadow-sm">
           <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">{isPartnerView ? 'Unit Mobil Saya' : 'Armada Mobil'}</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">{isPartnerView ? 'Unit Kendaraan Saya' : 'Armada Kendaraan'}</h2>
               <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm">Kelola ketersediaan, foto, dan struktur biaya unit.</p>
             </div>
             
@@ -327,7 +327,7 @@ const FleetPage: React.FC<Props> = ({ currentUser }) => {
                     )}
                     {!isPartnerView && (
                         <button onClick={() => openModal()} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all font-bold shadow-lg shadow-indigo-200 dark:shadow-none active:scale-95">
-                            <Plus size={20} /> <span className="hidden sm:inline">Tambah Mobil</span>
+                            <Plus size={20} /> <span className="hidden sm:inline">Tambah Kendaraan</span>
                         </button>
                     )}
                 </div>
@@ -431,7 +431,7 @@ const FleetPage: React.FC<Props> = ({ currentUser }) => {
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
               <div className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-2xl p-6 shadow-2xl max-h-[90vh] overflow-hidden flex flex-col border border-slate-200 dark:border-slate-700">
                   <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-xl font-bold text-slate-800 dark:text-white">{editingCar ? 'Edit Data Mobil' : 'Tambah Mobil Baru'}</h3>
+                      <h3 className="text-xl font-bold text-slate-800 dark:text-white">{editingCar ? 'Edit Data Kendaraan' : 'Tambah Kendaraan Baru'}</h3>
                       <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 bg-slate-100 dark:bg-slate-700 p-1 rounded-full"><X size={24} /></button>
                   </div>
 
@@ -455,8 +455,8 @@ const FleetPage: React.FC<Props> = ({ currentUser }) => {
                                   </div>
                               </div>
                               <div className="space-y-4">
-                                  <div><label className="block text-xs font-black uppercase text-slate-400 tracking-widest">Nama Mobil</label><input required type="text" placeholder="Veloz" className="w-full border dark:border-slate-700 dark:bg-slate-900 dark:text-white rounded-xl p-2.5 mt-1 font-bold" value={name} onChange={e => setName(e.target.value)} /></div>
-                                  <div><label className="block text-xs font-black uppercase text-slate-400 tracking-widest">Merek Mobil</label><input required type="text" placeholder="Toyota" className="w-full border dark:border-slate-700 dark:bg-slate-900 dark:text-white rounded-xl p-2.5 mt-1 font-bold uppercase" value={brand} onChange={e => setBrand(e.target.value)} /></div>
+                                  <div><label className="block text-xs font-black uppercase text-slate-400 tracking-widest">Nama Kendaraan</label><input required type="text" placeholder="Veloz" className="w-full border dark:border-slate-700 dark:bg-slate-900 dark:text-white rounded-xl p-2.5 mt-1 font-bold" value={name} onChange={e => setName(e.target.value)} /></div>
+                                  <div><label className="block text-xs font-black uppercase text-slate-400 tracking-widest">Merek Kendaraan</label><input required type="text" placeholder="Toyota" className="w-full border dark:border-slate-700 dark:bg-slate-900 dark:text-white rounded-xl p-2.5 mt-1 font-bold uppercase" value={brand} onChange={e => setBrand(e.target.value)} /></div>
                                   <div className="grid grid-cols-2 gap-4">
                                     <div><label className="block text-xs font-black uppercase text-slate-400 tracking-widest">Plat Nomor</label><input required type="text" placeholder="B 1234 XX" className="w-full border dark:border-slate-700 dark:bg-slate-900 dark:text-white rounded-xl p-2.5 mt-1 font-bold font-mono uppercase" value={plate} onChange={e => setPlate(e.target.value)} /></div>
                                     <div><label className="block text-xs font-black uppercase text-slate-400 tracking-widest">Kategori</label><select className="w-full border dark:border-slate-700 dark:bg-slate-900 dark:text-white rounded-xl p-2.5 mt-1 font-bold" value={type} onChange={e => setType(e.target.value)}>{settings.carCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}</select></div>

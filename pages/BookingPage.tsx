@@ -7,7 +7,7 @@ import {
   Filter, Info, Send, Wallet, CheckSquare, Clock as ClockIcon,
   DollarSign, CreditCard, Tag, ArrowRight, History, XCircle,
   Camera, Printer, ChevronLeft, ChevronRight, LayoutList, GanttChart,
-  Building, UserCheck, Inbox, Tag as TagIcon, SearchIcon, Lock, QrCode
+  Building, UserCheck, Inbox, Tag as TagIcon, SearchIcon, Lock, QrCode, ThumbsUp
 } from 'lucide-react';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -268,9 +268,37 @@ const BookingPage: React.FC<Props> = ({ currentUser }) => {
     }
   }, [selectedCarId, selectedDriverId, useDriver, startDate, startTime, endDate, endTime, customBasePrice, deliveryFee, extraCost, overtimeFee, discount, bookings, cars, drivers, highSeasons, editingBookingId, isRentToRent]);
 
+  const handleApproveSubmission = (submission: Booking) => {
+    if (!confirm("Terima pengajuan sewa ini?")) return;
+    
+    const updated = bookings.map(b => {
+        if (b.id === submission.id) {
+            return { ...b, status: BookingStatus.BOOKED };
+        }
+        return b;
+    });
+
+    // Also auto-approve customer if they were pending
+    if (submission.customerId) {
+        const currentCustomers = getStoredData<Customer[]>('customers', []);
+        const updatedCustomers = currentCustomers.map(c => {
+            if (c.id === submission.customerId && c.status === 'Pending') {
+                return { ...c, status: 'Approved' as const };
+            }
+            return c;
+        });
+        setStoredData('customers', updatedCustomers);
+        setCustomers(updatedCustomers);
+    }
+
+    setBookings(updated);
+    setStoredData('bookings', updated);
+    setSuccessMessage("Booking telah diterima & dikonfirmasi!");
+    setTimeout(() => setSuccessMessage(''), 3000);
+  };
+
   const handleQRScan = (decodedText: string) => {
     try {
-        // Gunakan Regex untuk ekstraksi ID kendaraan yang lebih handal dari URL HashRouter
         const carIdMatch = decodedText.match(/[?&]carId=([^&]+)/);
         const scanId = carIdMatch ? carIdMatch[1] : null;
 
@@ -279,7 +307,7 @@ const BookingPage: React.FC<Props> = ({ currentUser }) => {
             setActiveTab('create');
             setIsScannerOpen(false);
         } else {
-            alert("QR Code tidak valid. Pastikan ini adalah QR unit armada resmi.");
+            alert("QR Code tidak valid.");
         }
     } catch (e) {
         alert("Gagal membaca kode QR.");
@@ -354,7 +382,6 @@ const BookingPage: React.FC<Props> = ({ currentUser }) => {
     let newTransactions: Transaction[] = [...currentTx];
     let oldPaid = editingBookingId ? (bookings.find(b => b.id === editingBookingId)?.amountPaid || 0) : 0;
     
-    // 1. Catat Pemasukan
     if (paid > oldPaid) {
         newTransactions.unshift({
             id: `tx-${Date.now()}`,
@@ -369,18 +396,15 @@ const BookingPage: React.FC<Props> = ({ currentUser }) => {
         });
     }
 
-    // 2. Automasi Pengeluaran saat Selesai & Lunas
     if (newBooking.status === BookingStatus.COMPLETED && newBooking.paymentStatus === PaymentStatus.PAID) {
         const diffMs = new Date(newBooking.endDate).getTime() - new Date(newBooking.startDate).getTime();
         const bookingDays = Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
 
-        // Bayar Vendor
         if (newBooking.isRentToRent && newBooking.vendorId && (newBooking.vendorFee || 0) > 0) {
              if (!newTransactions.some(t => t.bookingId === newBooking.id && t.category === 'Sewa Vendor')) {
                  newTransactions.unshift({ id: `auto-v-${Date.now()}`, date: new Date().toISOString(), amount: Number(newBooking.vendorFee), type: 'Expense', category: 'Sewa Vendor', description: `Bayar Vendor #${newBooking.id.slice(0,6)}`, bookingId: newBooking.id, relatedId: newBooking.vendorId, status: 'Pending' });
              }
         }
-        // Bagi Hasil Investor
         if (!newBooking.isRentToRent) {
             const car = cars.find(c => c.id === newBooking.carId);
             if (car && car.partnerId && (car.investorSetoran || 0) > 0) {
@@ -389,7 +413,6 @@ const BookingPage: React.FC<Props> = ({ currentUser }) => {
                 }
             }
         }
-        // Gaji Driver
         if (newBooking.driverId && newBooking.driverFee > 0) {
              if (!newTransactions.some(t => t.bookingId === newBooking.id && t.category === 'Gaji')) {
                  newTransactions.unshift({ id: `auto-g-${Date.now()}`, date: new Date().toISOString(), amount: newBooking.driverFee, type: 'Expense', category: 'Gaji', description: `Gaji Trip #${newBooking.id.slice(0,6)}`, bookingId: newBooking.id, relatedId: newBooking.driverId, status: 'Pending' });
@@ -512,6 +535,7 @@ const BookingPage: React.FC<Props> = ({ currentUser }) => {
 
   const bookingCounts = useMemo(() => ({
     All: bookings.length,
+    [BookingStatus.PENDING_APPROVAL]: bookings.filter(b => b.status === BookingStatus.PENDING_APPROVAL).length,
     [BookingStatus.BOOKED]: bookings.filter(b => b.status === BookingStatus.BOOKED).length,
     [BookingStatus.ACTIVE]: bookings.filter(b => b.status === BookingStatus.ACTIVE).length,
     [BookingStatus.COMPLETED]: bookings.filter(b => b.status === BookingStatus.COMPLETED).length,
@@ -536,7 +560,7 @@ const BookingPage: React.FC<Props> = ({ currentUser }) => {
           <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">Booking & Jadwal</h2>
-              <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm">Manajemen ketersediaan armada terintegrasi.</p>
+              <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm">Manajemen sewa unit resmi dan pengajuan mandiri.</p>
             </div>
             
             <div className="flex items-center gap-3">
@@ -859,10 +883,12 @@ const BookingPage: React.FC<Props> = ({ currentUser }) => {
                   </div>
               </div>
               <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
-                  {['All', BookingStatus.BOOKED, BookingStatus.ACTIVE, BookingStatus.COMPLETED, BookingStatus.CANCELLED].map((status) => (
+                  {['All', BookingStatus.PENDING_APPROVAL, BookingStatus.BOOKED, BookingStatus.ACTIVE, BookingStatus.COMPLETED, BookingStatus.CANCELLED].map((status) => (
                       <button key={status} onClick={() => setFilterStatus(status)} className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all border-2 ${filterStatus === status ? 'bg-red-600 border-red-600 text-white shadow-lg' : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-500'}`}>
-                          {status === 'All' ? 'Semua' : status}
-                          <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded-full bg-black/10">{bookingCounts[status as keyof typeof bookingCounts] || bookings.length}</span>
+                          {status === 'All' ? 'Semua' : status === BookingStatus.PENDING_APPROVAL ? 'Pengajuan' : status}
+                          <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded-full bg-black/10">
+                            {bookingCounts[status as keyof typeof bookingCounts] !== undefined ? bookingCounts[status as keyof typeof bookingCounts] : bookings.length}
+                          </span>
                       </button>
                   ))}
               </div>
@@ -870,35 +896,49 @@ const BookingPage: React.FC<Props> = ({ currentUser }) => {
                   {filteredBookingsList.map(b => {
                       const car = cars.find(c => c.id === b.carId);
                       const isDue = b.totalPrice > b.amountPaid;
+                      const isPendingApproval = b.status === BookingStatus.PENDING_APPROVAL;
+                      
                       return (
-                          <div key={b.id} className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col gap-6 relative group transition-all hover:shadow-md">
+                          <div key={b.id} className={`p-6 rounded-2xl border shadow-sm flex flex-col gap-6 relative group transition-all hover:shadow-md ${isPendingApproval ? 'bg-amber-50/50 dark:bg-amber-900/10 border-amber-200 animate-pulse' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700'}`}>
                               <div className="flex flex-col md:flex-row justify-between items-center gap-5">
                                   <div className="flex items-center gap-5 w-full">
                                       <div className="w-16 h-16 bg-slate-100 dark:bg-slate-900 rounded-2xl flex items-center justify-center flex-shrink-0 border dark:border-slate-700">
                                           {(car?.image || b.isRentToRent) ? <img src={car?.image || 'https://picsum.photos/200/200?random=v'} className="w-full h-full object-cover rounded-2xl" /> : <CarIcon className="text-slate-400"/>}
                                       </div>
                                       <div className="flex-1 space-y-1">
-                                          <h4 className="font-black text-slate-800 dark:text-white text-lg uppercase tracking-tight">
-                                              {b.isRentToRent ? b.externalCarName : car?.name} 
-                                              <span className="text-xs bg-slate-100 dark:bg-slate-900 px-2 py-0.5 rounded ml-2 font-mono">{b.isRentToRent ? b.externalCarPlate : car?.plate}</span>
-                                          </h4>
+                                          <div className="flex items-center gap-2">
+                                              <h4 className="font-black text-slate-800 dark:text-white text-lg uppercase tracking-tight">
+                                                  {b.isRentToRent ? b.externalCarName : car?.name} 
+                                                  <span className="text-xs bg-slate-100 dark:bg-slate-900 px-2 py-0.5 rounded ml-2 font-mono">{b.isRentToRent ? b.externalCarPlate : car?.plate}</span>
+                                              </h4>
+                                              {isPendingApproval && <span className="bg-amber-600 text-white text-[8px] font-black px-2 py-0.5 rounded uppercase flex items-center gap-1"><Zap size={10}/> Pengajuan Mandiri</span>}
+                                          </div>
                                           <div className="flex flex-wrap gap-4 text-xs font-bold text-slate-500 uppercase">
                                               <span className="flex items-center gap-1.5"><Calendar size={14} className="text-red-600"/> {new Date(b.startDate).toLocaleDateString('id-ID')}</span>
                                               <span className="flex items-center gap-1.5 text-red-600"><UserIcon size={14}/> {b.customerName}</span>
                                               <span className={`px-2 py-0.5 rounded-full ${isDue ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>Rp {b.totalPrice.toLocaleString()}</span>
                                           </div>
                                       </div>
-                                      <span className={`text-[10px] font-black px-4 py-1.5 rounded-full uppercase ${b.status === 'Active' ? 'bg-green-600 text-white' : b.status === 'Completed' ? 'bg-slate-200' : 'bg-orange-50 text-orange-700'}`}>{b.status}</span>
+                                      <span className={`text-[10px] font-black px-4 py-1.5 rounded-full uppercase ${b.status === BookingStatus.PENDING_APPROVAL ? 'bg-amber-100 text-amber-700' : b.status === 'Active' ? 'bg-green-600 text-white' : b.status === 'Completed' ? 'bg-slate-200' : 'bg-orange-50 text-orange-700'}`}>{b.status === BookingStatus.PENDING_APPROVAL ? 'Review' : b.status}</span>
                                   </div>
                               </div>
                               <div className="flex flex-wrap gap-2 w-full pt-4 border-t dark:border-slate-700">
-                                  {isDue && b.status !== BookingStatus.CANCELLED && <button onClick={() => { handleEdit(b); setAmountPaid(b.totalPrice.toString()); }} className="flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white rounded-xl text-xs font-black uppercase shadow-lg shadow-green-100"><CheckCircle size={16}/> Lunasi</button>}
-                                  {b.status === BookingStatus.ACTIVE && <button onClick={() => { handleEdit(b); setCurrentStatus(BookingStatus.COMPLETED); setActualReturnDate(todayStr); }} className="flex items-center gap-1.5 px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-black uppercase"><History size={16}/> Selesai</button>}
-                                  <button onClick={() => window.open(generateWhatsAppLink(b, car || {name: b.externalCarName, plate: b.externalCarPlate} as any), '_blank')} className="px-4 py-2 bg-green-50 text-green-600 rounded-xl text-xs font-black uppercase flex items-center gap-2"><MessageCircle size={16}/> WA</button>
-                                  <button onClick={() => generateInvoicePDF(b, car || {name: b.externalCarName, plate: b.externalCarPlate} as any)} className="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-black uppercase flex items-center gap-2"><Printer size={16}/> Nota</button>
-                                  <button onClick={() => handleEdit(b)} className="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200"><Edit2 size={18}/></button>
-                                  <button onClick={() => { setChecklistBooking(b); setIsChecklistModalOpen(true); }} className={`p-2 rounded-xl border ${b.checklist ? 'bg-green-600 text-white' : 'bg-yellow-50 text-yellow-600'}`}><ClipboardCheck size={18}/></button>
-                                  {isSuperAdmin && <button onClick={() => { if(confirm('Hapus?')) setBookings(prev => prev.filter(x=>x.id!==b.id)) }} className="p-2 text-slate-400 hover:text-red-600"><Trash2 size={18}/></button>}
+                                  {isPendingApproval ? (
+                                      <>
+                                        <button onClick={() => handleApproveSubmission(b)} className="flex items-center gap-1.5 px-6 py-2 bg-amber-600 text-white rounded-xl text-xs font-black uppercase shadow-lg active:scale-95 transition-all"><ThumbsUp size={16}/> Terima & Konfirmasi</button>
+                                        <button onClick={() => handleEdit(b)} className="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-xs font-bold uppercase">Detail Form</button>
+                                      </>
+                                  ) : (
+                                      <>
+                                        {isDue && b.status !== BookingStatus.CANCELLED && <button onClick={() => { handleEdit(b); setAmountPaid(b.totalPrice.toString()); }} className="flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white rounded-xl text-xs font-black uppercase shadow-lg shadow-green-100"><CheckCircle size={16}/> Lunasi</button>}
+                                        {b.status === BookingStatus.ACTIVE && <button onClick={() => { handleEdit(b); setCurrentStatus(BookingStatus.COMPLETED); setActualReturnDate(todayStr); }} className="flex items-center gap-1.5 px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-black uppercase"><History size={16}/> Selesai</button>}
+                                        <button onClick={() => window.open(generateWhatsAppLink(b, car || {name: b.externalCarName, plate: b.externalCarPlate} as any), '_blank')} className="px-4 py-2 bg-green-50 text-green-600 rounded-xl text-xs font-black uppercase flex items-center gap-2"><MessageCircle size={16}/> WA</button>
+                                        <button onClick={() => generateInvoicePDF(b, car || {name: b.externalCarName, plate: b.externalCarPlate} as any)} className="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-black uppercase flex items-center gap-2"><Printer size={16}/> Nota</button>
+                                        <button onClick={() => handleEdit(b)} className="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200"><Edit2 size={18}/></button>
+                                        <button onClick={() => { setChecklistBooking(b); setIsChecklistModalOpen(true); }} className={`p-2 rounded-xl border ${b.checklist ? 'bg-green-600 text-white' : 'bg-yellow-50 text-yellow-600'}`}><ClipboardCheck size={18}/></button>
+                                      </>
+                                  )}
+                                  {isSuperAdmin && <button onClick={() => { if(confirm('Hapus?')) setBookings(prev => prev.filter(x=>x.id!==b.id)) }} className="p-2 text-slate-400 hover:text-red-600 ml-auto"><Trash2 size={18}/></button>}
                               </div>
                           </div>
                       );
@@ -907,7 +947,7 @@ const BookingPage: React.FC<Props> = ({ currentUser }) => {
           </div>
       )}
 
-      {/* CHECKLIST MODAL */}
+      {/* CHECKLIST MODAL (SAME AS BEFORE) */}
       {isChecklistModalOpen && checklistBooking && (
           <div className="fixed inset-0 bg-slate-900/80 z-[100] flex items-center justify-center p-4 backdrop-blur-md">
               <div className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-4xl p-8 shadow-2xl max-h-[95vh] overflow-y-auto border-t-8 border-red-600">

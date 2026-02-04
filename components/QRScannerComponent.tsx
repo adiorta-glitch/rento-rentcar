@@ -57,7 +57,7 @@ export const QRScannerComponent: React.FC<Props> = ({ onScan, onClose }) => {
         
         <div className="p-6 text-center">
           <p className="text-slate-500 dark:text-slate-400 text-xs font-medium leading-relaxed px-4">
-            Arahkan kamera ke kode QR yang tertempel pada unit armada untuk memilih mobil secara otomatis.
+            Arahkan kamera ke kode QR yang tertempel pada unit armada untuk memilih Kendaraan secara otomatis.
           </p>
         </div>
       </div>

@@ -190,7 +190,7 @@ _Harga dapat berubah sewaktu-waktu._`;
                   <h3 className="font-bold text-slate-800 flex items-center gap-2 border-b pb-2"><CarIcon size={18} className="text-indigo-600"/> Kendaraan & Waktu</h3>
                   
                   <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Unit Mobil</label>
+                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Unit Kendaraan</label>
                       <select className="w-full border rounded-xl p-3 font-bold text-slate-700 bg-slate-50" value={selectedCarId} onChange={e => setSelectedCarId(e.target.value)}>
                           {cars.map(c => (
                               <option key={c.id} value={c.id}>{c.name} - {c.plate}</option>
@@ -328,7 +328,7 @@ _Harga dapat berubah sewaktu-waktu._`;
                                   {selectedCar ? <img src={selectedCar.image} className="w-full h-full object-cover rounded-xl opacity-90" /> : <CarIcon size={32} />}
                               </div>
                               <div>
-                                  <h2 className="text-2xl font-bold">{selectedCar?.name || 'Pilih Mobil'}</h2>
+                                  <h2 className="text-2xl font-bold">{selectedCar?.name || 'Pilih Kendaraan'}</h2>
                                   <p className="text-slate-400 text-sm">{selectedCar?.plate} • {result.durationDays} Hari</p>
                               </div>
                           </div>

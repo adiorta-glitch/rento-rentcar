@@ -192,7 +192,7 @@ const PartnersPage: React.FC<Props> = ({ currentUser }) => {
         const days = Math.max(1, Math.ceil((new Date(t.endDate).getTime() - new Date(t.startDate).getTime()) / (1000 * 60 * 60 * 24)));
         return {
             Tanggal: new Date(t.startDate).toLocaleDateString('id-ID'),
-            Mobil: car?.name,
+            Kendaraan: car?.name,
             Plat: car?.plate,
             Durasi: `${days} Hari`,
             Tamu: t.customerName,

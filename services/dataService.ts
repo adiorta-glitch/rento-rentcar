@@ -31,7 +31,7 @@ H. Pihak Rental berhak menolak permohonan sewa jika identitas dirasa kurang meya
 
 2. Pembayaran dan Durasi Sewa
 A. Booking Fee (DP): Penyewa wajib membayar uang muka minimal 30-50% dari total biaya sewa untuk mengamankan jadwal.
-B. Pelunasan: Sisa pembayaran wajib dilunasi sebelum serah terima kunci mobil.
+B. Pelunasan: Sisa pembayaran wajib dilunasi sebelum serah terima kunci Kendaraan.
 C. Perhitungan Waktu:
 D. Paket 12 Jam / 24 Jam (Full Day).
 E. Keterlambatan pengembalian (Overtime) dikenakan denda sebesar 10% per jam dari harga sewa harian.
@@ -41,23 +41,23 @@ I. Pembatalan H-1: DP hangus 50%.
 Ii. Pembatalan pada hari H: DP hangus 100%.
 
 3. Tanggung Jawab Penyewa
-A. Kondisi Mobil: Mobil diserahkan dalam keadaan bersih dan laik jalan. Penyewa wajib mengembalikan dalam kondisi kebersihan yang sama. (Jika kotor berlebih/bau rokok tajam, dikenakan biaya salon sebesar Rp650.000,-).
+A. Kondisi Kendaraan: Kendaraan diserahkan dalam keadaan bersih dan laik jalan. Penyewa wajib mengembalikan dalam kondisi kebersihan yang sama. (Jika kotor berlebih/bau rokok tajam, dikenakan biaya salon sebesar Rp650.000,-).
 B. Bahan Bakar (BBM): Sistem pengembalian BBM adalah posisi sama dengan saat pengambilan (Return to same level).
-C. Penggunaan: Mobil hanya boleh digunakan sesuai peruntukan jalan raya (bukan untuk offroad, balapan, atau mengangkut barang yang merusak interior/bau menyengat seperti durian/ikan basah tanpa wadah kedap udara).
+C. Penggunaan: Kendaraan hanya boleh digunakan sesuai peruntukan jalan raya (bukan untuk offroad, balapan, atau mengangkut barang yang merusak interior/bau menyengat seperti durian/ikan basah tanpa wadah kedap udara).
 
 4. Kerusakan dan Kecelakaan
 A. Kerusakan Light (Lecet/Penyok): Penyewa bertanggung jawab penuh atas biaya perbaikan di bengkel yang ditunjuk oleh Pihak Rental.
 B. Kerusakan Berat/Kecelakaan:
 i. Penyewa menanggung seluruh biaya perbaikan.
-ii. Biaya Masa Tunggu (Idle Cost): Penyewa wajib membayar biaya sewa harian selama mobil berada di bengkel (karena mobil tidak bisa beroperasi/menghasilkan uang).
-C. Kehilangan: Jika terjadi kehilangan unit akibat kelalaian Penyewa (kunci tertinggal, parkir sembarangan), Penyewa wajib mengganti unit dengan spesifikasi setara atau membayar tunai seharga mobil tersebut di pasaran.
+ii. Biaya Masa Tunggu (Idle Cost): Penyewa wajib membayar biaya sewa harian selama Kendaraan berada di bengkel (karena Kendaraan tidak bisa beroperasi/menghasilkan uang).
+C. Kehilangan: Jika terjadi kehilangan unit akibat kelalaian Penyewa (kunci tertinggal, parkir sembarangan), Penyewa wajib mengganti unit dengan spesifikasi setara atau membayar tunai seharga Kendaraan tersebut di pasaran.
 
 5. Larangan Keras
 A. Penyewa dilarang keras untuk:
-B. Menggadaikan mobil.
+B. Menggadaikan Kendaraan.
 C. Menyewakan kembali ke pihak ketiga (over-rent).
-D. Menggunakan mobil untuk tindak kejahatan/kriminal.
-E. Mengubah bentuk atau memodifikasi komponen mobil.
+D. Menggunakan Kendaraan untuk tindak kejahatan/kriminal.
+E. Mengubah bentuk atau memodifikasi komponen Kendaraan.
 
 6. Force Majeure
 Pihak Rental tidak bertanggung jawab atas kerugian Penyewa yang disebabkan oleh kejadian di luar kendali (bencana alam, huru-hara, atau kerusakan mesin murni karena faktor usia kendaraan yang bukan akibat kelalaian penggunaan).`,
@@ -301,7 +301,7 @@ export const downloadTemplateExcel = (type: 'armada' | 'pelanggan' | 'driver' | 
   switch(type) {
     case 'armada':
       const carTemplate: any = { 
-        nama_mobil: "Avanza G 2023", 
+        nama_Kendaraan: "Avanza G 2023", 
         merek: "Toyota", 
         plat_nomor: "B 1234 ABC", 
         kategori: "MPV",

@@ -104,8 +104,8 @@ const HelpPage: React.FC<Props> = ({ currentUser }) => {
                         <div className="space-y-2">
                             <p>Sistem QR digunakan untuk mempercepat pemilihan unit saat pembuatan booking.</p>
                             <ul className="list-disc pl-4 space-y-1">
-                                <li><strong>Mencetak QR:</strong> Buka menu <strong>"Armada Mobil"</strong>, klik ikon QR di pojok kanan atas gambar mobil. Anda bisa Cetak atau Download gambar QR untuk ditempel di dashboard mobil.</li>
-                                <li><strong>Scan QR:</strong> Buka menu <strong>"Booking & Jadwal"</strong>, klik ikon QR di header. Arahkan kamera ke QR mobil, dan sistem akan otomatis memilih mobil tersebut dalam form input baru.</li>
+                                <li><strong>Mencetak QR:</strong> Buka menu <strong>"Armada Kendaraan"</strong>, klik ikon QR di pojok kanan atas gambar Kendaraan. Anda bisa Cetak atau Download gambar QR untuk ditempel di dashboard Kendaraan.</li>
+                                <li><strong>Scan QR:</strong> Buka menu <strong>"Booking & Jadwal"</strong>, klik ikon QR di header. Arahkan kamera ke QR Kendaraan, dan sistem akan otomatis memilih Kendaraan tersebut dalam form input baru.</li>
                             </ul>
                         </div>
                     }
@@ -121,11 +121,11 @@ const HelpPage: React.FC<Props> = ({ currentUser }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FaqItem 
                     icon={CarIcon}
-                    question="Cara Menambahkan Unit Mobil Baru" 
+                    question="Cara Menambahkan Unit Kendaraan Baru" 
                     answer={
                         <ol className="list-decimal pl-4 space-y-1">
-                            <li>Buka menu <strong>"Armada Mobil"</strong> di sidebar.</li>
-                            <li>Klik tombol biru <strong>"+ Tambah Mobil"</strong> di pojok kanan atas.</li>
+                            <li>Buka menu <strong>"Armada Kendaraan"</strong> di sidebar.</li>
+                            <li>Klik tombol biru <strong>"+ Tambah Kendaraan"</strong> di pojok kanan atas.</li>
                             <li>Lengkapi data: Nama, Plat, Kategori, Foto, dan <strong>Skema Harga</strong>.</li>
                             <li>Klik <strong>"Simpan Data"</strong>.</li>
                         </ol>
@@ -163,7 +163,7 @@ const HelpPage: React.FC<Props> = ({ currentUser }) => {
                             <li>Buka menu <strong>"Investor & Rekanan"</strong>.</li>
                             <li>Klik <strong>"+ Tambah Investor"</strong>.</li>
                             <li>Data ini digunakan untuk menentukan pemilik unit yang akan menerima setoran hasil sewa.</li>
-                            <li>Setelah disimpan, Anda bisa menghubungkan unit mobil ke investor ini di menu 'Armada'.</li>
+                            <li>Setelah disimpan, Anda bisa menghubungkan unit Kendaraan ke investor ini di menu 'Armada'.</li>
                         </ol>
                     }
                 />
@@ -187,7 +187,7 @@ const HelpPage: React.FC<Props> = ({ currentUser }) => {
                             <li>Buka menu <strong>"Booking & Jadwal"</strong>.</li>
                             <li>Pilih tab <strong>"Input Baru"</strong> di bagian atas.</li>
                             <li>Tentukan <strong>Waktu Sewa</strong> (Mulai & Selesai).</li>
-                            <li>Pilih <strong>Unit Mobil</strong>. Sistem akan otomatis memvalidasi ketersediaan.</li>
+                            <li>Pilih <strong>Unit Kendaraan</strong>. Sistem akan otomatis memvalidasi ketersediaan.</li>
                             <li>Pilih <strong>Pelanggan</strong> dari database atau ketik manual.</li>
                             <li>Tentukan biaya, paket sewa, dan nominal DP/Bayar.</li>
                             <li>Klik <strong>"Simpan & Kunci Jadwal"</strong>.</li>

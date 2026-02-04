@@ -1,5 +1,6 @@
 
 export enum BookingStatus {
+  PENDING_APPROVAL = 'Pending Approval',
   BOOKED = 'Booked',
   ACTIVE = 'Active',
   COMPLETED = 'Completed',
@@ -150,7 +151,6 @@ export interface Booking {
   securityDepositValue: number;
   securityDepositDescription: string;
   securityDepositImage?: string;
-  checklist?: VehicleChecklist;
   basePrice: number;
   driverFee: number;
   highSeasonFee: number;
@@ -166,6 +166,8 @@ export interface Booking {
   notes: string;
   customerNote?: string;
   driverNote?: string;
+  // Added checklist property to fix type errors in BookingPage
+  checklist?: VehicleChecklist;
   createdAt: number;
 }
 
